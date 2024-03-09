@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ePrachar</string>
+    <string name="enter_reference_code">Enter Reference Code</string>
+    <string name="submit">Submit</string>
+    <string name="whatsapp_suffix">.com</string>
+
+    <style name="whatsapp_suffix">ABCD</style>
+</resources>
