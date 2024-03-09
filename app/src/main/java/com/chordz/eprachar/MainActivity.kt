@@ -244,6 +244,7 @@ class MainActivity : AppCompatActivity() {
             if (isConnectedToInternet()) {
                 homeViewModel!!.getMsgContactNo(editTextValue)
             } else {
+
                 showNoInternetDialog()
             }
 
