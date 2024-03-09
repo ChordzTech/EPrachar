@@ -1,7 +1,6 @@
 package com.chordz.eprachar;
 
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,11 +9,14 @@ import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.chordz.eprachar.data.StoreData;
 import com.chordz.eprachar.data.response.DataItem;
 import com.chordz.eprachar.data.response.ElectionMessageResponse;
+import com.chordz.eprachar.preferences.AppPreferences;
 
+import java.util.Date;
 import java.util.List;
 
 public class EndCallReceiver extends BroadcastReceiver {
@@ -22,16 +24,44 @@ public class EndCallReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
+        if (!validate(context)) {
+            return;
+        }
         Bundle bundle = intent.getExtras();
         String phoneNumber = bundle.getString("incoming_number");
         String phoneStateString = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
         Log.e("TAG", "onReceive: " + phoneNumber + " " + phoneStateString);
-        if (phoneNumber != null && !phoneNumber.isEmpty()
-                && ((phoneStateString.contains("OFFHOOK")) || (phoneStateString.contains("RINGING")))
-        ) {
+        if (phoneNumber != null && !phoneNumber.isEmpty() && ((phoneStateString.contains("OFFHOOK")) || (phoneStateString.contains("RINGING")))) {
             openWhatsApp(context, phoneNumber);
         }
+    }
+
+    private boolean validate(Context context) {
+        String todaysDate = DateUtils.INSTANCE.getDateInYYYYMMDDFormat();
+        Date Today = DateUtils.INSTANCE.stringToDateConverter(todaysDate);
+        String resetDate = AppPreferences.INSTANCE.getStringValueFromSharedPreferences(AppPreferences.RESET_DATE);
+        Date LastResetDate = DateUtils.INSTANCE.stringToDateConverter(resetDate);
+        int todaysMessageCount = AppPreferences.INSTANCE.getIntValueFromSharedPreferences(AppPreferences.TODAYS_MESSAGE_COUNT);
+        int dailyMessageCount = AppPreferences.INSTANCE.getIntValueFromSharedPreferences(AppPreferences.DAILY_MESSAGE_LIMIT);
+        boolean pracharOnOff = AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF);
+        if (!pracharOnOff) {
+            Toast.makeText(context, "Prachar is Off", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (LastResetDate.equals(Today) && todaysMessageCount < dailyMessageCount) {
+            return true;
+        } else {
+            Toast.makeText(context, "Update Your Daily Message Limit", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+    }
+
+    private void resetAllValues(Context context) {
+        AppPreferences.INSTANCE.saveStringToSharedPreferences(context, AppPreferences.RESET_DATE,
+                DateUtils.INSTANCE.getDateInYYYYMMDDFormat());
+        AppPreferences.INSTANCE.saveIntToSharedPreferences(context, AppPreferences.TODAYS_MESSAGE_COUNT,
+                0);
     }
 
     private void openWhatsApp(Context context, String phoneNumber) {
@@ -83,7 +113,7 @@ public class EndCallReceiver extends BroadcastReceiver {
         try {
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNumber, phoneNumber, defaultMessage, null, null);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -101,11 +131,9 @@ public class EndCallReceiver extends BroadcastReceiver {
     }
 
 
-    interface OnPhoneStateReceived{
+    interface OnPhoneStateReceived {
         void onPhoneStateReceived(String phoneNumber);
     }
-
-
 
 
 }

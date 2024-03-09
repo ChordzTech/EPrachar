@@ -11,11 +11,15 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.Button
+import android.widget.CompoundButton
+import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -24,35 +28,29 @@ import com.chordz.eprachar.data.StoreData.msgDetails
 import com.chordz.eprachar.data.remote.RetroFitService.Companion.getInstance
 import com.chordz.eprachar.data.response.DataItem
 import com.chordz.eprachar.data.response.ElectionMessageResponse
+import com.chordz.eprachar.preferences.AppPreferences
 import com.chordz.eprachar.viewModel.AppViewModelFactory
 import com.chordz.eprachar.viewModel.HomeViewModel
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var etMaxNoOfMsg: EditText
     var editText = ""
     var apiResponse = ""
     private var phoneNumberEditText: EditText? = null
     private var openWhatsAppButton: Button? = null
+    private lateinit var swOnOff: SwitchCompat
     private var homeViewModel: HomeViewModel? = null
     private var detailsList: ArrayList<DataItem?>? = ArrayList()
     private val dataItem: DataItem? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        if (!isAccessibilityOn(this, WhatsappAccessibilityService::class.java)) {
-            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-            this.startActivity(intent)
-        }
-
         if (!foregroundServiceRunning()) {
             val serviceIntent = Intent(this, MyForegroundService::class.java)
             startForegroundService(serviceIntent)
         }
         initView()
         fetchData()
-        val serviceManager = AccessibilityServiceManager(this)
-        if (!serviceManager.hasAccessibilityServicePermission(MyAccessibilityService::class.java)) {
-            serviceManager.requestUserForAccessibilityService(this)
-        }
     }
 
     private fun isAccessibilityOn(
@@ -93,9 +91,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun initObservable() {
         homeViewModel!!.electionmsgLiveData.observe(this) { electionMessageResponse: ElectionMessageResponse ->
-            if (!electionMessageResponse.data!!.isEmpty()) {
+            if (electionMessageResponse.code == 200 && !electionMessageResponse.data!!.isEmpty()) {
                 detailsList = electionMessageResponse.data as ArrayList<DataItem?>?
                 msgDetails = electionMessageResponse
+                Toast.makeText(this, "Sync Success", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Sync Failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -117,8 +118,26 @@ class MainActivity : AppCompatActivity() {
             HomeViewModel::class.java
         )
         initObservable()
+        etMaxNoOfMsg = findViewById(R.id.etMaxNoOfMsg);
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText)
         openWhatsAppButton = findViewById(R.id.openWhatsAppButton)
+        swOnOff = findViewById(R.id.swOnOff)
+        swOnOff.setOnCheckedChangeListener(object : OnCheckedChangeListener {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+                if (isChecked)
+                    AppPreferences.saveBooleanToSharedPreferences(
+                        this@MainActivity,
+                        AppPreferences.PRACHAR_ON_OFF,
+                        true
+                    )
+                else
+                    AppPreferences.saveBooleanToSharedPreferences(
+                        this@MainActivity,
+                        AppPreferences.PRACHAR_ON_OFF,
+                        false
+                    )
+            }
+        })
         openWhatsAppButton?.setOnClickListener(View.OnClickListener { check() })
 
 
@@ -152,20 +171,38 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!isAccessibilityOn(this, WhatsappAccessibilityService::class.java)) {
+            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+            this.startActivity(intent)
+        }
+        val serviceManager = AccessibilityServiceManager(this)
+        if (!serviceManager.hasAccessibilityServicePermission(MyAccessibilityService::class.java)) {
+            serviceManager.requestUserForAccessibilityService(this)
+        }
         check()
     }
 
     private fun check() {
+
         val editTextValue = phoneNumberEditText!!.text.toString().trim { it <= ' ' }
+        if (etMaxNoOfMsg.text.toString().isEmpty()) {
+            Toast.makeText(this, "Please enter Daily Message Limit", Toast.LENGTH_SHORT).show()
+            return
+        }
         if (editTextValue.isEmpty()) {
             Toast.makeText(this, "Please enter admin number", Toast.LENGTH_SHORT).show()
             return
         }
+        AppPreferences.saveIntToSharedPreferences(
+            this,
+            AppPreferences.DAILY_MESSAGE_LIMIT,
+            etMaxNoOfMsg.text.toString().toInt()
+        )
+
         try {
 //            int messageId = Integer.parseInt(editTextValue);
 //            homeViewModel.getMsgById(messageId);
             homeViewModel!!.getMsgContactNo(editTextValue)
-            Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
         } catch (e: NumberFormatException) {
             // Handle the case when the input is not a valid integer
             showMismatchAlertDialog()
@@ -182,6 +219,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions(): Boolean {
+        AppPreferences.saveStringToSharedPreferences(
+            this, AppPreferences.RESET_DATE,
+            com.chordz.eprachar.DateUtils.getDateInYYYYMMDDFormat()
+        )
         val readCallLogPermission =
             ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
         val readPhoneStatePermission =

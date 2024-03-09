@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <string name="suchana">सुचना:\n\n
+1. कृपया ॲपद्वारे विनंती केलेल्या सर्व परवानग्या स्वीकारा.\n
+2. कृपया सेटिंगमधून Accessibility परवानगी सक्षम करा.\n
+3. कृपया वरील बॉक्समध्ये प्रशासक क्रमांक प्रविष्ट करा.\n
+4. ॲप वितरकाकडून प्रशासक क्रमांक घ्या.</string>
+
+    <string name="heading">ई-निवडणूक प्रचार</string>
+
+    <string name="stopPrachar">प्रचार बंद करा</string>
+    <string name="daily_message_limit">दैनिक संदेश मर्यादा</string>
+    <string name="enter_admin_code">प्रशासक कोड प्रविष्ट करा</string>
+    <string name="enter_admin_details">प्रशासक कोड प्रविष्ट करा</string>
+    <string name="submit">प्रस्तुत करणे</string>
+
+</resources>
