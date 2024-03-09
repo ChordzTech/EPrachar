@@ -8,10 +8,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
-import android.text.format.DateUtils
 import android.view.View
 import android.widget.Button
 import android.widget.CompoundButton
@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             val serviceIntent = Intent(this, MyForegroundService::class.java)
             startForegroundService(serviceIntent)
         }
+
         initView()
         fetchData()
     }
@@ -112,11 +113,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() {
+
+
         val retrofitService = getInstance()
         val mainRepository = MainRepository(retrofitService)
         homeViewModel = ViewModelProvider(this, AppViewModelFactory(mainRepository)).get(
             HomeViewModel::class.java
         )
+
+
         initObservable()
         etMaxNoOfMsg = findViewById(R.id.etMaxNoOfMsg);
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText)
@@ -184,6 +189,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun check() {
 
+
         val editTextValue = phoneNumberEditText!!.text.toString().trim { it <= ' ' }
         if (etMaxNoOfMsg.text.toString().isEmpty()) {
             Toast.makeText(this, "Please enter Daily Message Limit", Toast.LENGTH_SHORT).show()
@@ -202,7 +208,12 @@ class MainActivity : AppCompatActivity() {
         try {
 //            int messageId = Integer.parseInt(editTextValue);
 //            homeViewModel.getMsgById(messageId);
-            homeViewModel!!.getMsgContactNo(editTextValue)
+            if (isConnectedToInternet()) {
+                homeViewModel!!.getMsgContactNo(editTextValue)
+            } else {
+                showNoInternetDialog()
+            }
+
         } catch (e: NumberFormatException) {
             // Handle the case when the input is not a valid integer
             showMismatchAlertDialog()
@@ -294,5 +305,20 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val PERMISSION_REQUEST_CODE = 1
+    }
+
+    open fun isConnectedToInternet(): Boolean {
+        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
+
+    open fun showNoInternetDialog() {
+        Toast.makeText(
+            this,
+            "Please check your internet connection and try again.",
+            Toast.LENGTH_SHORT
+        ).show()
+
     }
 }
