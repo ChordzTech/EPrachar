@@ -188,9 +188,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun check() {
+        //Admin number long
+        // daily limit int
+
 
 
         val editTextValue = phoneNumberEditText!!.text.toString().trim { it <= ' ' }
+        if (AppPreferences.getLongValueFromSharedPreferences(AppPreferences.ADMIN_NUMBER) != 0L) {
+            phoneNumberEditText!!.setText(
+                AppPreferences.getLongValueFromSharedPreferences(
+                    AppPreferences.ADMIN_NUMBER
+                ).toString()
+            )
+        }
+        if (AppPreferences.getIntValueFromSharedPreferences(AppPreferences.DAILY_MESSAGE_LIMIT) != 0) {
+            etMaxNoOfMsg.setText(
+                AppPreferences.getIntValueFromSharedPreferences(AppPreferences.DAILY_MESSAGE_LIMIT)
+                    .toString()
+            )
+        }
+        if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)) {
+            swOnOff.isChecked =
+                AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)
+        }
+
+
         if (etMaxNoOfMsg.text.toString().isEmpty()) {
             Toast.makeText(this, "Please enter Daily Message Limit", Toast.LENGTH_SHORT).show()
             return
@@ -204,6 +226,17 @@ class MainActivity : AppCompatActivity() {
             AppPreferences.DAILY_MESSAGE_LIMIT,
             etMaxNoOfMsg.text.toString().toInt()
         )
+        AppPreferences.saveLongToSharedPreferences(
+            this,
+            AppPreferences.ADMIN_NUMBER,
+            editTextValue.toLong()
+        )
+        AppPreferences.saveBooleanToSharedPreferences(
+            this,
+            AppPreferences.PRACHAR_ON_OFF,
+            swOnOff.isChecked
+        )
+
 
         try {
 //            int messageId = Integer.parseInt(editTextValue);

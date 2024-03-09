@@ -16,6 +16,7 @@ object AppPreferences {
     const val TODAYS_MESSAGE_COUNT ="TODAYS_MESSAGE_COUNT"
     const val RESET_DATE = "RESET_DATE"
     const val PRACHAR_ON_OFF ="PRACHAR_ON_OFF"
+    const val ADMIN_NUMBER ="ADMIN_NUMBER"
     private var sharedPreferences: SharedPreferences? = null
 
     private const val SharedPreferencesName = "DSBOX_PREFERENCES"
