@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 
 object AppPreferences {
 
+    val SEND_MESSAGE: String ="SEND_MESSAGE"
     const val IS_CREATING_ESTIMATE: String = "is_creating_estimate"
     const val MOBILE_NUMBER: String = "mobile_number"
     const val DEVICE_INFO: String = "device_info"
@@ -16,6 +17,8 @@ object AppPreferences {
     const val TODAYS_MESSAGE_COUNT ="TODAYS_MESSAGE_COUNT"
     const val RESET_DATE = "RESET_DATE"
     const val PRACHAR_ON_OFF ="PRACHAR_ON_OFF"
+    const val SMS_ON_OFF ="PRACHAR_ON_OFF"
+    const val WHATSAPP_ON_OFF ="PRACHAR_ON_OFF"
     const val ADMIN_NUMBER ="ADMIN_NUMBER"
     private var sharedPreferences: SharedPreferences? = null
 

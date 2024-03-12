@@ -6,6 +6,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
+import com.chordz.eprachar.preferences.AppPreferences;
+
 import java.util.List;
 
 public class WhatsappAccessibilityService extends AccessibilityService {
@@ -18,7 +20,7 @@ public class WhatsappAccessibilityService extends AccessibilityService {
 
         AccessibilityNodeInfoCompat rootInActiveWindow = AccessibilityNodeInfoCompat.wrap(getRootInActiveWindow());
 
-        // Whatsapp Message EditText id
+       /* // Whatsapp Message EditText id
         List<AccessibilityNodeInfoCompat> messageNodeList = rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.whatsapp:id/entry");
         if (messageNodeList == null || messageNodeList.isEmpty()) {
             return;
@@ -30,7 +32,7 @@ public class WhatsappAccessibilityService extends AccessibilityService {
                 || !messageField.getText().toString().endsWith(getApplicationContext().getString(R.string.whatsapp_suffix))) { // So your service doesn't process any message, but the ones ending your apps suffix
             return;
         }
-
+*/
         // Whatsapp send button id
         List<AccessibilityNodeInfoCompat> sendMessageNodeInfoList = rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.whatsapp:id/send");
         if (sendMessageNodeInfoList == null || sendMessageNodeInfoList.isEmpty()) {
@@ -41,10 +43,11 @@ public class WhatsappAccessibilityService extends AccessibilityService {
         if (!sendMessageButton.isVisibleToUser()) {
             return;
         }
-
-        // Now fire a click on the send button
+        if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)) {
+            // Now fire a click on the send button
+            return;
+        }
         sendMessageButton.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-
         // Now go back to your app by clicking on the Android back button twice: 
         // First one to leave the conversation screen 
         // Second one to leave whatsapp

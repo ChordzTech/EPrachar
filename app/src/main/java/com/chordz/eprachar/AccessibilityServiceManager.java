@@ -54,6 +54,7 @@ public class AccessibilityServiceManager {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
                         Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
                         activity.startActivity(intent);
                     }

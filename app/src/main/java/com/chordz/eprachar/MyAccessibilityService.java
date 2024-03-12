@@ -10,6 +10,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
+import com.chordz.eprachar.preferences.AppPreferences;
+
 import java.util.List;
 
 public class MyAccessibilityService extends AccessibilityService {
@@ -34,8 +36,10 @@ public class MyAccessibilityService extends AccessibilityService {
                     if (!sendMessage.isVisibleToUser()) {
                         return;
                     }
+                    if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)) {
+                       return;
+                    }
                     sendMessage.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-
                     try {
                         Thread.sleep(2000);
                         performGlobalAction(GLOBAL_ACTION_BACK);

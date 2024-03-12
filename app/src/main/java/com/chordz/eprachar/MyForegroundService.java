@@ -17,11 +17,11 @@ public class MyForegroundService extends Service {
                 new Runnable() {
                     @Override
                     public void run() {
-                        while (true){
-                            Log.e("Service","Service is running");
+                        while (true) {
+                            Log.e("Service", "Service is running");
                             try {
                                 Thread.sleep(2000);
-                            }catch (InterruptedException e){
+                            } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -41,7 +41,7 @@ public class MyForegroundService extends Service {
         Notification.Builder notification = new Notification.Builder(this,CHANNELID)
                 .setContentText("Service is running")
                 .setContentTitle("Service enabled")
-                .setSmallIcon(R.drawable.ic_launcher_background);
+                .setSmallIcon(R.mipmap.ic_elauncher);
         startForeground(1001,notification.build());
 
         return super.onStartCommand(intent, flags, startId);

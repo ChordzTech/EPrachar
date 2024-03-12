@@ -2,7 +2,7 @@
     <string name="app_name">ePrachar</string>
     <string name="enter_admin_details">Enter Admin Details</string>
     <string name="submit">Submit</string>
-    <string name="whatsapp_suffix">.com</string>
+    <string name="whatsapp_suffix">EPrachar</string>
     <string name="suchana">NOTE:\n\n
 1. Please accept all permissions requested by the app.\n
 2. Please enable Accessibility permission from settings.\n
@@ -11,9 +11,9 @@
     <string name="heading">E-Election Campaign</string>
     <string name="off">Off</string>
     <string name="on">On</string>
-    <string name="stopPrachar">Stop Prachar</string>
+    <string name="stopPrachar">Prachar</string>
+    <string name="sms">SMS</string>
+    <string name="whatsapp">WhatsApp</string>
     <string name="daily_message_limit">Daily Message Limit</string>
     <string name="enter_admin_code">Enter Admin Code</string>
-
-    <style name="whatsapp_suffix">ABCD</style>
 </resources>

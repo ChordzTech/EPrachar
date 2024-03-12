@@ -3,6 +3,7 @@ package com.chordz.eprachar.viewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chordz.eprachar.data.ElectionDataHolder
 import com.chordz.eprachar.data.MainRepository
 import com.chordz.eprachar.data.remote.NetworkState
 import com.chordz.eprachar.data.response.ElectionMessageResponse
@@ -17,6 +18,7 @@ class HomeViewModel (val repository: MainRepository) : ViewModel() {
     fun getMsgContactNo(
         a_contactno:String
     ) {
+        ElectionDataHolder.adminContactNumber = a_contactno
         viewModelScope.launch {
             when (val response = repository.getElectionDetailsMsgByContact(a_contactno)) {
                 is NetworkState.Success -> {

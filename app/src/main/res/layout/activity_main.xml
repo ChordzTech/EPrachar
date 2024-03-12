@@ -106,9 +106,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:padding="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/textView2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/swWhatsAppOnOff"
                 app:layout_constraintTop_toTopOf="parent">
 
 
@@ -129,21 +127,78 @@
                 android:padding="8dp"
                 android:text="@string/stopPrachar"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toTopOf="@+id/swOnOff"
-                app:layout_constraintEnd_toEndOf="@+id/sv"
-                app:layout_constraintStart_toStartOf="@+id/sv" />
+                android:background="@color/cardview_shadow_start_color"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tvStopWhatsAppOnOff"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/swOnOff"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/cardview_shadow_start_color"
                 android:checked="false"
-                android:textOff="@string/off"
-                android:textOn="@string/on"
+                android:gravity="center"
+                android:paddingEnd="4dp"
                 android:thumb="@drawable/switch_button_thumb"
+                app:layout_constraintBottom_toTopOf="@+id/textView2"
+                app:layout_constraintEnd_toEndOf="@+id/textView2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:track="@drawable/switch_button_track" />
+
+            <TextView
+                android:id="@+id/tvStopWhatsAppOnOff"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/sms"
+                android:textSize="16sp"
+                android:background="@color/cardview_shadow_start_color"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tvStopswSMSOnOff"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/textView2" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/swWhatsAppOnOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/cardview_shadow_start_color"
+                android:checked="false"
+                android:paddingEnd="4dp"
+                android:thumb="@drawable/switch_button_thumb"
+                app:layout_constraintBottom_toTopOf="@+id/tvStopWhatsAppOnOff"
+                app:layout_constraintEnd_toEndOf="@+id/tvStopWhatsAppOnOff"
+                app:layout_constraintStart_toEndOf="@+id/textView2"
+                app:track="@drawable/switch_button_track" />
+
+            <TextView
+                android:id="@+id/tvStopswSMSOnOff"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/whatsapp"
+                android:textSize="16sp"
+                android:background="@color/cardview_shadow_start_color"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/tvStopWhatsAppOnOff" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/swSMSOnOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/cardview_shadow_start_color"
+                android:checked="false"
+                android:paddingEnd="4dp"
+                android:thumb="@drawable/switch_button_thumb"
+                app:layout_constraintBottom_toTopOf="@+id/tvStopswSMSOnOff"
+                app:layout_constraintEnd_toEndOf="@+id/tvStopswSMSOnOff"
+                app:layout_constraintStart_toEndOf="@+id/tvStopWhatsAppOnOff"
                 app:track="@drawable/switch_button_track" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
