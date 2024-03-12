@@ -21,17 +21,16 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.CompoundButton
-import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModelProvider
+import com.chordz.eprachar.data.ElectionDataHolder
 import com.chordz.eprachar.data.MainRepository
 import com.chordz.eprachar.data.ElectionDataHolder.msgDetails
 import com.chordz.eprachar.data.remote.RetroFitService.Companion.getInstance
@@ -40,12 +39,16 @@ import com.chordz.eprachar.data.response.ElectionMessageResponse
 import com.chordz.eprachar.preferences.AppPreferences
 import com.chordz.eprachar.viewModel.AppViewModelFactory
 import com.chordz.eprachar.viewModel.HomeViewModel
+import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.Calendar
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var root: ConstraintLayout
+    private var imageBitmap: Bitmap? = null
     private lateinit var swSMSOnOff: SwitchCompat
     private lateinit var swWhatsAppOnOff: SwitchCompat
     private val PROVIDER_AUTHORITY: String = "com.chordz.eprachar.provider"
@@ -68,33 +71,37 @@ class MainActivity : AppCompatActivity() {
 
             startForegroundService(serviceIntent)
         }
-
         initView()
+        updateUI()
         fetchData()
         val phoneNumber = intent.getStringExtra("PHONE_NUMBER")
         if (phoneNumber != null) {
             processPrachar(phoneNumber);
-        } else {
-            check()
         }
     }
 
     private fun processPrachar(phoneNumber: String) {
-        updateUI()
+        if (ElectionDataHolder.pracharContactsMap.keys.contains(phoneNumber)) {
+            val contactedTimes: Int = ElectionDataHolder.pracharContactsMap[phoneNumber]!!
+            ElectionDataHolder.pracharContactsMap[phoneNumber] = contactedTimes + 1
+        } else {
+            ElectionDataHolder.pracharContactsMap.put(phoneNumber, 1)
+        }
+        if (ElectionDataHolder.pracharContactsMap[phoneNumber]!! >
+            AppPreferences.getIntValueFromSharedPreferences(AppPreferences.DAILY_MESSAGE_LIMIT)
+        ) {
+            Snackbar.make(root, "Message limit is overed for this number", Snackbar.LENGTH_LONG)
+                .show()
+            return
+        }
 
         Handler(Looper.myLooper()!!).postDelayed(Runnable {
-            if (isConnectedToInternet()) {
-                homeViewModel!!.getMsgContactNo(phoneNumber)
-            } else {
-
-                showNoInternetDialog()
-            }
-        }, 5000)
-
-        Handler(Looper.myLooper()!!).postDelayed(Runnable {
-            AppPreferences.saveBooleanToSharedPreferences(this, AppPreferences.SEND_MESSAGE, true)
             openWhatsApp(this, phoneNumber)
         }, 1500)
+
+        Handler(Looper.myLooper()!!).postDelayed(Runnable {
+            check()
+        }, 3000)
     }
 
     private fun updateUI() {
@@ -165,7 +172,11 @@ class MainActivity : AppCompatActivity() {
                 val details = response.data
                 val defaultMessage = details[0]!!.aMessage
                 val defaultImage = details[0]!!.aImage
-//                sendSMSMessage(phoneNumber, defaultMessage!!)
+                if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF))
+                    Handler(Looper.myLooper()!!).postDelayed({
+                        sendSMSMessage(phoneNumber, defaultMessage!!)
+                    }, 5000)
+
 
                 //Code For New Line
 //                String formattedMessage = defaultMessage.replace("|", "\n");
@@ -182,15 +193,16 @@ class MainActivity : AppCompatActivity() {
 
                 // Add FLAG_ACTIVITY_NEW_TASK flag
                 whatsappIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                // Start the activity
-//                context.startActivity(whatsappIntent)
-                var bitmap = context.getDrawable(R.mipmap.ic_elauncher)!!.toBitmap();
-//                constructShareableContent(context,bitmap,defaultMessage!!)
-                shareViaWhatsApp(bitmap, defaultMessage!!, phoneNumber)
-                Log.e(
-                    "TAG",
-                    "onReceive: MyAccessibilityServicephoneNumber: $formattedPhoneNumber"
-                )
+
+                if (ElectionDataHolder.messageBitmap == null) {
+                    Snackbar.make(root, "Message not downloaded", Snackbar.LENGTH_SHORT).show()
+                } else if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+                    shareViaWhatsApp(
+                        ElectionDataHolder.messageBitmap!!,
+                        defaultMessage!!,
+                        phoneNumber
+                    )
+                }
             }
         } else {
             val intent = Intent(context, MainActivity::class.java)
@@ -276,6 +288,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun initView() {
 
+        if (ElectionDataHolder.hourlyMessageUpdateTime == null) {
+            ElectionDataHolder.hourlyMessageUpdateTime = Calendar.getInstance().timeInMillis
+        }
+
+        if (ElectionDataHolder.DailyCountUpdateTime == null) {
+            ElectionDataHolder.hourlyMessageUpdateTime = Calendar.getInstance().timeInMillis
+        }
 
         val retrofitService = getInstance()
         val mainRepository = MainRepository(retrofitService)
@@ -284,52 +303,73 @@ class MainActivity : AppCompatActivity() {
         )
 
         initObservable()
+        root = findViewById(R.id.root)
         etMaxNoOfMsg = findViewById(R.id.etMaxNoOfMsg);
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText)
         openWhatsAppButton = findViewById(R.id.openWhatsAppButton)
         swOnOff = findViewById(R.id.swOnOff)
         swWhatsAppOnOff = findViewById(R.id.swWhatsAppOnOff)
         swSMSOnOff = findViewById(R.id.swSMSOnOff)
-        swSMSOnOff.setOnCheckedChangeListener(object : OnCheckedChangeListener {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-                TODO("Not yet implemented")
+        swSMSOnOff.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked)
+                AppPreferences.saveBooleanToSharedPreferences(
+                    this@MainActivity,
+                    AppPreferences.SMS_ON_OFF,
+                    true
+                )
+            else
+                AppPreferences.saveBooleanToSharedPreferences(
+                    this@MainActivity,
+                    AppPreferences.SMS_ON_OFF,
+                    false
+                )
+        }
+        swWhatsAppOnOff.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked)
+                AppPreferences.saveBooleanToSharedPreferences(
+                    this@MainActivity,
+                    AppPreferences.WHATSAPP_ON_OFF,
+                    true
+                )
+            else
+                AppPreferences.saveBooleanToSharedPreferences(
+                    this@MainActivity,
+                    AppPreferences.WHATSAPP_ON_OFF,
+                    false
+                )
+        }
+        swOnOff.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                swWhatsAppOnOff.isChecked = true
+                swSMSOnOff.isChecked = true
+                AppPreferences.saveBooleanToSharedPreferences(
+                    this@MainActivity,
+                    AppPreferences.PRACHAR_ON_OFF,
+                    true
+                )
+            } else {
+                swWhatsAppOnOff.isChecked = false
+                swSMSOnOff.isChecked = false
+                AppPreferences.saveBooleanToSharedPreferences(
+                    this@MainActivity,
+                    AppPreferences.PRACHAR_ON_OFF,
+                    false
+                )
             }
+        }
+        openWhatsAppButton?.setOnClickListener(View.OnClickListener {
+            resetAllValues(this)
+            check()
         })
-        swWhatsAppOnOff.setOnCheckedChangeListener(object : OnCheckedChangeListener {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-                if (isChecked)
-                    AppPreferences.saveBooleanToSharedPreferences(
-                        this@MainActivity,
-                        AppPreferences.WHATSAPP_ON_OFF,
-                        true
-                    )
-                else
-                    AppPreferences.saveBooleanToSharedPreferences(
-                        this@MainActivity,
-                        AppPreferences.WHATSAPP_ON_OFF,
-                        false
-                    )
-            }
-        })
-        swOnOff.setOnCheckedChangeListener(object : OnCheckedChangeListener {
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-                if (isChecked)
-                    AppPreferences.saveBooleanToSharedPreferences(
-                        this@MainActivity,
-                        AppPreferences.SMS_ON_OFF,
-                        true
-                    )
-                else
-                    AppPreferences.saveBooleanToSharedPreferences(
-                        this@MainActivity,
-                        AppPreferences.SMS_ON_OFF,
-                        false
-                    )
-            }
-        })
-        openWhatsAppButton?.setOnClickListener(View.OnClickListener { check() })
-
-
+        Log.e("TAG", "initView: "+  ElectionDataHolder.hourlyMessageUpdateTime!!)
+        if (DateUtils.needToHourlyMessageUpdated(
+                Calendar.getInstance().timeInMillis,
+                ElectionDataHolder.hourlyMessageUpdateTime!!
+            )
+        ) {
+            Toast.makeText(this, "Refreshing Message", Toast.LENGTH_SHORT).show()
+            check()
+        }
 //        AccessibilityServiceManager serviceManager = new AccessibilityServiceManager(this);
 //        openWhatsAppButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -376,30 +416,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun resetAllValues(context: Context) {
+        ElectionDataHolder.pracharContactsMap.clear()
+        AppPreferences.saveStringToSharedPreferences(
+            context, AppPreferences.DAILY_RESET_DATE,
+            DateUtils.getCurrentDateTime()
+        )
+        AppPreferences.saveIntToSharedPreferences(
+            context, AppPreferences.TODAYS_MESSAGE_COUNT,
+            0
+        )
+    }
+
     private fun check() {
         //Admin number long
         // daily limit int
 
 
         val editTextValue = phoneNumberEditText!!.text.toString().trim { it <= ' ' }
-        if (AppPreferences.getLongValueFromSharedPreferences(AppPreferences.ADMIN_NUMBER) != 0L) {
-            phoneNumberEditText!!.setText(
-                AppPreferences.getLongValueFromSharedPreferences(
-                    AppPreferences.ADMIN_NUMBER
-                ).toString()
-            )
-        }
-        if (AppPreferences.getIntValueFromSharedPreferences(AppPreferences.DAILY_MESSAGE_LIMIT) != 0) {
-            etMaxNoOfMsg.setText(
-                AppPreferences.getIntValueFromSharedPreferences(AppPreferences.DAILY_MESSAGE_LIMIT)
-                    .toString()
-            )
-        }
-        if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)) {
-            swOnOff.isChecked =
-                AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)
-        }
-
 
         if (etMaxNoOfMsg.text.toString().isEmpty()) {
             Toast.makeText(this, "Please enter Daily Message Limit", Toast.LENGTH_SHORT).show()
@@ -409,11 +443,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Please enter admin number", Toast.LENGTH_SHORT).show()
             return
         }
-        AppPreferences.saveIntToSharedPreferences(
-            this,
-            AppPreferences.DAILY_MESSAGE_LIMIT,
-            etMaxNoOfMsg.text.toString().toInt()
-        )
+
         AppPreferences.saveLongToSharedPreferences(
             this,
             AppPreferences.ADMIN_NUMBER,
@@ -425,12 +455,18 @@ class MainActivity : AppCompatActivity() {
             swOnOff.isChecked
         )
 
+        AppPreferences.saveIntToSharedPreferences(
+            this,
+            AppPreferences.DAILY_MESSAGE_LIMIT,
+            etMaxNoOfMsg.text.toString().toInt()
+        )
+
 
         try {
 //            int messageId = Integer.parseInt(editTextValue);
 //            homeViewModel.getMsgById(messageId);
             if (isConnectedToInternet()) {
-                homeViewModel!!.getMsgContactNo(editTextValue)
+                homeViewModel!!.getMsgContactNo(this, editTextValue)
             } else {
 
                 showNoInternetDialog()
@@ -453,8 +489,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkPermissions(): Boolean {
         AppPreferences.saveStringToSharedPreferences(
-            this, AppPreferences.RESET_DATE,
-            com.chordz.eprachar.DateUtils.getDateInYYYYMMDDFormat()
+            this, AppPreferences.DAILY_RESET_DATE,
+            com.chordz.eprachar.DateUtils.getCurrentDateTime()
         )
         val readCallLogPermission =
             ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
@@ -524,10 +560,18 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val phoneNumber = intent.getStringExtra("PHONE_NUMBER")
+        Log.e("TAG", "initView: "+  ElectionDataHolder.hourlyMessageUpdateTime!!)
+        if (DateUtils.needToHourlyMessageUpdated(
+                Calendar.getInstance().timeInMillis,
+                ElectionDataHolder.hourlyMessageUpdateTime!!
+            )
+        ) {
+            Toast.makeText(this, "Refreshing Message", Toast.LENGTH_SHORT).show()
+            check()
+        }
+
         if (phoneNumber != null) {
             processPrachar(phoneNumber);
-        } else {
-            check()
         }
     }
 

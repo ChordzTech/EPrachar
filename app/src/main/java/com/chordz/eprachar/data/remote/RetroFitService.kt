@@ -1,5 +1,6 @@
 package com.chordz.eprachar.data.remote
 
+import com.chordz.eprachar.data.ElectionDataHolder.BASE_URL
 import com.chordz.eprachar.data.response.ElectionMessageResponse
 import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
@@ -14,7 +15,7 @@ import retrofit2.http.Path
 
 interface RetroFitService {
 
-    @GET("getMessagebyCode/{a_contactno}/")
+    @GET("/getMessagebyCode/{a_contactno}/")
     suspend fun getdetailsListByContact(
         @Path(value = "a_contactno") a_contactno: String
     ): Response<ElectionMessageResponse>
@@ -42,7 +43,7 @@ interface RetroFitService {
                 //This Below Url Has to be Replaced with Current Url
                 // https://dsboxplus.dishaswaraj.in/api/
 
-                val retrofit = Retrofit.Builder().baseUrl("http://electionapi.beatsacademy.in/")
+                val retrofit = Retrofit.Builder().baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(getLogger())
                     .client(httpClientBuilder.build()).build()

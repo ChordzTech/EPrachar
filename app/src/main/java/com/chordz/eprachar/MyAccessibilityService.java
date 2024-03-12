@@ -42,6 +42,12 @@ public class MyAccessibilityService extends AccessibilityService {
                     sendMessage.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     try {
                         Thread.sleep(2000);
+                        if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)
+                                || !AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+                            // Now fire a click on the send button
+                            return;
+                        }
+                        performGlobalAction(GLOBAL_ACTION_BACK);
                         performGlobalAction(GLOBAL_ACTION_BACK);
                         //add below line, if u want to close whatsApp;
                         //performGlobalAction(GLOBAL_ACTION_BACK);
@@ -53,6 +59,7 @@ public class MyAccessibilityService extends AccessibilityService {
                     e.printStackTrace();
                 }
                 Log.e(TAG, "onAccessibilityEvent: " + name);
+                performGlobalAction(GLOBAL_ACTION_BACK);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }

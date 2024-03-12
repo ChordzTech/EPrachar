@@ -43,7 +43,8 @@ public class WhatsappAccessibilityService extends AccessibilityService {
         if (!sendMessageButton.isVisibleToUser()) {
             return;
         }
-        if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)) {
+        if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)
+                || !AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
             // Now fire a click on the send button
             return;
         }
@@ -53,10 +54,22 @@ public class WhatsappAccessibilityService extends AccessibilityService {
         // Second one to leave whatsapp
         try {
             Thread.sleep(500); // hack for certain devices in which the immediate back click is too fast to handle
+            if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)
+                    || !AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+                // Now fire a click on the send button
+                return;
+            }
+            performGlobalAction(GLOBAL_ACTION_BACK);
             performGlobalAction(GLOBAL_ACTION_BACK);
             Thread.sleep(500);  // same hack as above
         } catch (InterruptedException ignored) {
         }
+        if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)
+                || !AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+            // Now fire a click on the send button
+            return;
+        }
+        performGlobalAction(GLOBAL_ACTION_BACK);
         performGlobalAction(GLOBAL_ACTION_BACK);
     }
 

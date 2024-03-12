@@ -3,11 +3,9 @@ package com.chordz.eprachar
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.net.Uri
-import android.os.Environment
 import android.telephony.SmsManager
 import android.telephony.TelephonyManager
 import android.util.Log
@@ -15,33 +13,22 @@ import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.FileProvider
-import androidx.core.graphics.drawable.toBitmap
-import com.chordz.eprachar.DateUtils.getDateInYYYYMMDDFormat
-import com.chordz.eprachar.DateUtils.stringToDateConverter
-import com.chordz.eprachar.MainActivity
+import com.chordz.eprachar.data.ElectionDataHolder
 import com.chordz.eprachar.data.ElectionDataHolder.msgDetails
 import com.chordz.eprachar.preferences.AppPreferences
-import com.chordz.eprachar.preferences.AppPreferences.getBooleanValueFromSharedPreferences
-import com.chordz.eprachar.preferences.AppPreferences.getIntValueFromSharedPreferences
-import com.chordz.eprachar.preferences.AppPreferences.getStringValueFromSharedPreferences
-import com.chordz.eprachar.preferences.AppPreferences.saveIntToSharedPreferences
-import com.chordz.eprachar.preferences.AppPreferences.saveStringToSharedPreferences
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 class EndCallReceiver : BroadcastReceiver() {
     private var serviceManager: AccessibilityServiceManager? = null
     private var wm: WindowManager? = null
     private var params1: WindowManager.LayoutParams? = null
-    private var phoneNumber: String? = null
+    private var phoneNumber: String = ""
     override fun onReceive(context: Context, intent: Intent) {
-        if (!validate(context)) {
+        /*if (!validate(context)) {
             return
-        }
+        }*/
         val bundle = intent.extras
-        phoneNumber = bundle!!.getString("incoming_number")
+        phoneNumber = bundle!!.getString("incoming_number").toString()
+
         val phoneStateString = intent.getStringExtra(TelephonyManager.EXTRA_STATE)
         Log.e("TAG", "onReceive: $phoneNumber $phoneStateString")
         if (phoneNumber != null && !phoneNumber!!.isEmpty() && (phoneStateString!!.contains("OFFHOOK") || phoneStateString.contains(
@@ -69,7 +56,7 @@ class EndCallReceiver : BroadcastReceiver() {
         params1!!.y = 400
         params1!!.format = PixelFormat.TRANSLUCENT
         ly1 = LinearLayout(context)
-        ly1!!.setBackgroundColor(Color.WHITE)
+        ly1!!.setBackgroundColor(Color.TRANSPARENT)
         val textView = TextView(context)
         textView.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -87,38 +74,6 @@ class EndCallReceiver : BroadcastReceiver() {
         ly1!!.orientation = LinearLayout.VERTICAL
         wm!!.addView(ly1, params1)
         ly1!!.callOnClick()
-    }
-
-    private fun validate(context: Context): Boolean {
-        val todaysDate = getDateInYYYYMMDDFormat()
-        val Today = stringToDateConverter(todaysDate)
-        val resetDate = getStringValueFromSharedPreferences(AppPreferences.RESET_DATE)
-        val LastResetDate = stringToDateConverter(resetDate!!)
-        val todaysMessageCount =
-            getIntValueFromSharedPreferences(AppPreferences.TODAYS_MESSAGE_COUNT)
-        val dailyMessageCount = getIntValueFromSharedPreferences(AppPreferences.DAILY_MESSAGE_LIMIT)
-        val pracharOnOff = getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)
-        if (!pracharOnOff) {
-            Toast.makeText(context, "Prachar is Off", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        return if (LastResetDate == Today && todaysMessageCount < dailyMessageCount) {
-            true
-        } else {
-            Toast.makeText(context, "Update Your Daily Message Limit", Toast.LENGTH_SHORT).show()
-            false
-        }
-    }
-
-    private fun resetAllValues(context: Context) {
-        saveStringToSharedPreferences(
-            context, AppPreferences.RESET_DATE,
-            getDateInYYYYMMDDFormat()
-        )
-        saveIntToSharedPreferences(
-            context, AppPreferences.TODAYS_MESSAGE_COUNT,
-            0
-        )
     }
 
     private fun openWhatsApp(context: Context, phoneNumber: String) {
@@ -158,8 +113,6 @@ class EndCallReceiver : BroadcastReceiver() {
             //            serviceManager.requestUserForAccessibilityService( context);
         }
     }
-
-
 
 
     private fun sendSMSMessage(phoneNumber: String, defaultMessage: String?) {
