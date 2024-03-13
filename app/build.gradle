@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.chordz.eprachar"
-        minSdk 24
+        minSdk 21
         minSdkVersion 26
         targetSdk 33
         versionCode 1
