@@ -59,6 +59,11 @@ public class MyAccessibilityService extends AccessibilityService {
                     e.printStackTrace();
                 }
                 Log.e(TAG, "onAccessibilityEvent: " + name);
+                if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)
+                        || !AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+                    // Now fire a click on the send button
+                    return;
+                }
                 performGlobalAction(GLOBAL_ACTION_BACK);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
