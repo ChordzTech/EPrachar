@@ -76,7 +76,8 @@ class MainActivity : AppCompatActivity() {
         fetchData()
         val phoneNumber = intent.getStringExtra("PHONE_NUMBER")
         if (phoneNumber != null) {
-            processPrachar(phoneNumber);
+            Log.e("TAG", "processPrachar onCreate: ")
+//            processPrachar(phoneNumber);
         }
     }
 
@@ -97,11 +98,9 @@ class MainActivity : AppCompatActivity() {
 
         Handler(Looper.myLooper()!!).postDelayed(Runnable {
             openWhatsApp(this, phoneNumber)
-        }, 1500)
-
-        Handler(Looper.myLooper()!!).postDelayed(Runnable {
             check()
-        }, 3000)
+            finish()
+        }, 1000)
     }
 
     private fun updateUI() {
@@ -173,9 +172,8 @@ class MainActivity : AppCompatActivity() {
                 val defaultMessage = details[0]!!.aMessage
                 val defaultImage = details[0]!!.aImage
                 if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF))
-                    Handler(Looper.myLooper()!!).postDelayed({
-                        sendSMSMessage(phoneNumber, defaultMessage!!)
-                    }, 5000)
+                    sendSMSMessage(phoneNumber, defaultMessage!!)
+
 
 
                 //Code For New Line
@@ -571,6 +569,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (phoneNumber != null) {
+            Log.e("TAG", "processPrachar onNewIntent: ")
             processPrachar(phoneNumber);
         }
     }

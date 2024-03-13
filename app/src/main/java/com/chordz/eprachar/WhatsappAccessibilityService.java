@@ -20,19 +20,14 @@ public class WhatsappAccessibilityService extends AccessibilityService {
 
         AccessibilityNodeInfoCompat rootInActiveWindow = AccessibilityNodeInfoCompat.wrap(getRootInActiveWindow());
 
-       /* // Whatsapp Message EditText id
         List<AccessibilityNodeInfoCompat> messageNodeList = rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.whatsapp:id/entry");
-        if (messageNodeList == null || messageNodeList.isEmpty()) {
-            return;
+        if (messageNodeList != null && !messageNodeList.isEmpty()) {
+            AccessibilityNodeInfoCompat messageField = messageNodeList.get(0);
+            if (messageField.getText() == null || messageField.getText().length() == 0
+                    || !messageField.getText().toString().endsWith(getApplicationContext().getString(R.string.whatsapp_suffix))) { // So your service doesn't process any message, but the ones ending your apps suffix
+                return;
+            }
         }
-
-        // check if the whatsapp message EditText field is filled with text and ending with your suffix (explanation above)
-        AccessibilityNodeInfoCompat messageField = messageNodeList.get(0);
-        if (messageField.getText() == null || messageField.getText().length() == 0
-                || !messageField.getText().toString().endsWith(getApplicationContext().getString(R.string.whatsapp_suffix))) { // So your service doesn't process any message, but the ones ending your apps suffix
-            return;
-        }
-*/
         // Whatsapp send button id
         List<AccessibilityNodeInfoCompat> sendMessageNodeInfoList = rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.whatsapp:id/send");
         if (sendMessageNodeInfoList == null || sendMessageNodeInfoList.isEmpty()) {
