@@ -22,6 +22,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
@@ -47,6 +48,7 @@ import java.util.Calendar
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var textView2: TextView
     private lateinit var root: ConstraintLayout
     private var imageBitmap: Bitmap? = null
     private lateinit var swSMSOnOff: SwitchCompat
@@ -117,9 +119,13 @@ class MainActivity : AppCompatActivity() {
                     .toString()
             )
         }
-        if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)) {
-            swOnOff.isChecked =
-                AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.PRACHAR_ON_OFF)
+        if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF)) {
+            swSMSOnOff.isChecked =
+                AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF)
+        }
+        if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+            swWhatsAppOnOff.isChecked =
+                AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)
         }
     }
 
@@ -201,6 +207,8 @@ class MainActivity : AppCompatActivity() {
                         phoneNumber
                     )
                 }
+            }else{
+                Toast.makeText(this, "Reset Prachar", Toast.LENGTH_SHORT).show()
             }
         } else {
             val intent = Intent(context, MainActivity::class.java)
@@ -306,8 +314,11 @@ class MainActivity : AppCompatActivity() {
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText)
         openWhatsAppButton = findViewById(R.id.openWhatsAppButton)
         swOnOff = findViewById(R.id.swOnOff)
+        swOnOff.visibility = View.GONE
         swWhatsAppOnOff = findViewById(R.id.swWhatsAppOnOff)
         swSMSOnOff = findViewById(R.id.swSMSOnOff)
+        textView2 = findViewById(R.id.textView2)
+        textView2.visibility = View.GONE
         swSMSOnOff.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked)
                 AppPreferences.saveBooleanToSharedPreferences(
@@ -336,7 +347,7 @@ class MainActivity : AppCompatActivity() {
                     false
                 )
         }
-        swOnOff.setOnCheckedChangeListener { buttonView, isChecked ->
+        /*swOnOff.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 swWhatsAppOnOff.isChecked = true
                 swSMSOnOff.isChecked = true
@@ -354,7 +365,7 @@ class MainActivity : AppCompatActivity() {
                     false
                 )
             }
-        }
+        }*/
         openWhatsAppButton?.setOnClickListener(View.OnClickListener {
             resetAllValues(this)
             check()
@@ -449,8 +460,13 @@ class MainActivity : AppCompatActivity() {
         )
         AppPreferences.saveBooleanToSharedPreferences(
             this,
-            AppPreferences.PRACHAR_ON_OFF,
-            swOnOff.isChecked
+            AppPreferences.SMS_ON_OFF,
+            swSMSOnOff.isChecked
+        )
+        AppPreferences.saveBooleanToSharedPreferences(
+            this,
+            AppPreferences.WHATSAPP_ON_OFF,
+            swWhatsAppOnOff.isChecked
         )
 
         AppPreferences.saveIntToSharedPreferences(
