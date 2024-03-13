@@ -4,6 +4,7 @@ import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.app.ActivityManager
 import android.app.AlertDialog
+import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -15,7 +16,9 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.provider.Settings
+import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
 import android.text.TextUtils
 import android.util.Log
@@ -32,8 +35,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.chordz.eprachar.data.ElectionDataHolder
-import com.chordz.eprachar.data.MainRepository
 import com.chordz.eprachar.data.ElectionDataHolder.msgDetails
+import com.chordz.eprachar.data.MainRepository
 import com.chordz.eprachar.data.remote.RetroFitService.Companion.getInstance
 import com.chordz.eprachar.data.response.DataItem
 import com.chordz.eprachar.data.response.ElectionMessageResponse
@@ -41,10 +44,12 @@ import com.chordz.eprachar.preferences.AppPreferences
 import com.chordz.eprachar.viewModel.AppViewModelFactory
 import com.chordz.eprachar.viewModel.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.Calendar
+import java.util.UUID
 
 
 class MainActivity : AppCompatActivity() {
@@ -131,15 +136,33 @@ class MainActivity : AppCompatActivity() {
 
     private fun shareViaWhatsApp(image: Bitmap, text: String, phoneNumber: String) {
         val callingNumber = phoneNumber.replace("+", "");
+        var phoneNumberWithCC = phoneNumber
+        if (phoneNumber.length == 10) {
+            phoneNumberWithCC = "91$phoneNumber"
+        }
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            setPackage("com.whatsapp");
+            component = ComponentName("com.whatsapp", "com.whatsapp.contact.picker.ContactPicker")
             putExtra(Intent.EXTRA_STREAM, getBitmapUriFromBitmap(this@MainActivity, image))
-            putExtra("jid", callingNumber + "@s.whatsapp.net"); //phone number without "+" prefix
+            putExtra("jid", phoneNumberWithCC + "@s.whatsapp.net"); //phone number without "+" prefix
             putExtra(Intent.EXTRA_TEXT, text)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             type = "image/*"
         }
         startActivity(shareIntent)
         finishAffinity()
+    }
+
+    fun getImageUri(inContext: Context?, inImage: Bitmap): Uri? {
+        val bytes = ByteArrayOutputStream()
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val path = MediaStore.Images.Media.insertImage(
+            this@MainActivity.contentResolver,
+            inImage,
+            UUID.randomUUID().toString() + ".png",
+            "drawing"
+        )
+        return Uri.parse(path)
     }
 
     private fun constructShareableContent(context: Context, image: Bitmap, text: String) {
@@ -181,7 +204,6 @@ class MainActivity : AppCompatActivity() {
                     sendSMSMessage(phoneNumber, defaultMessage!!)
 
 
-
                 //Code For New Line
 //                String formattedMessage = defaultMessage.replace("|", "\n");
 
@@ -197,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Add FLAG_ACTIVITY_NEW_TASK flag
                 whatsappIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
+//                this.startActivity(whatsappIntent)
                 if (ElectionDataHolder.messageBitmap == null) {
                     Snackbar.make(root, "Message not downloaded", Snackbar.LENGTH_SHORT).show()
                 } else if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
@@ -207,7 +229,7 @@ class MainActivity : AppCompatActivity() {
                         phoneNumber
                     )
                 }
-            }else{
+            } else {
                 Toast.makeText(this, "Reset Prachar", Toast.LENGTH_SHORT).show()
             }
         } else {
@@ -370,7 +392,7 @@ class MainActivity : AppCompatActivity() {
             resetAllValues(this)
             check()
         })
-        Log.e("TAG", "initView: "+  ElectionDataHolder.hourlyMessageUpdateTime!!)
+        Log.e("TAG", "initView: " + ElectionDataHolder.hourlyMessageUpdateTime!!)
         if (DateUtils.needToHourlyMessageUpdated(
                 Calendar.getInstance().timeInMillis,
                 ElectionDataHolder.hourlyMessageUpdateTime!!
@@ -574,7 +596,7 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val phoneNumber = intent.getStringExtra("PHONE_NUMBER")
-        Log.e("TAG", "initView: "+  ElectionDataHolder.hourlyMessageUpdateTime!!)
+        Log.e("TAG", "initView: " + ElectionDataHolder.hourlyMessageUpdateTime!!)
         if (DateUtils.needToHourlyMessageUpdated(
                 Calendar.getInstance().timeInMillis,
                 ElectionDataHolder.hourlyMessageUpdateTime!!
