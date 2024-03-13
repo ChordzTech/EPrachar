@@ -31,24 +31,37 @@ class HomeViewModel(val repository: MainRepository) : ViewModel() {
         viewModelScope.launch {
             when (val response = repository.getElectionDetailsMsgByContact(a_contactno)) {
                 is NetworkState.Success -> {
-                    Glide.with(context).asBitmap()
-                        .load(
-                            ElectionDataHolder.BASE_URL + response.data?.data!![0]!!.aImage!!
-                        )
-                        .into(object : CustomTarget<Bitmap>() {
-                            override fun onResourceReady(
-                                resource: Bitmap,
-                                transition: Transition<in Bitmap>?
-                            ) {
-                                ElectionDataHolder.messageBitmap = resource
-                                Toast.makeText(context, "Message Downloaded", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
+                    if (response.data.code == 200) {
+                        Glide.with(context).asBitmap()
+                            .load(
+                                ElectionDataHolder.BASE_URL + response.data?.data!![0]!!.aImage!!
+                            )
+                            .into(object : CustomTarget<Bitmap>() {
+                                override fun onResourceReady(
+                                    resource: Bitmap,
+                                    transition: Transition<in Bitmap>?
+                                ) {
+                                    ElectionDataHolder.messageBitmap = resource
+                                    Toast.makeText(
+                                        context,
+                                        "Message Downloaded",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                }
 
-                            override fun onLoadCleared(placeholder: Drawable?) {
-                            }
-                        })
-                    electionmsgLiveData.postValue(response.data!!)
+                                override fun onLoadCleared(placeholder: Drawable?) {
+                                }
+                            })
+                        electionmsgLiveData.postValue(response.data!!)
+                    }else{
+                        Toast.makeText(
+                            context,
+                            "Message Downloaded Failed",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
                 }
 
                 is NetworkState.Error -> {
