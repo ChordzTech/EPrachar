@@ -135,21 +135,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun shareViaWhatsApp(image: Bitmap, text: String, phoneNumber: String) {
-        val callingNumber = phoneNumber.replace("+", "");
-        var phoneNumberWithCC = callingNumber
-        if (callingNumber.length == 10) {
-            phoneNumberWithCC = "91$callingNumber"
-        }
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            setPackage("com.whatsapp");
-            component = ComponentName("com.whatsapp", "com.whatsapp.contact.picker.ContactPicker")
-            putExtra(Intent.EXTRA_STREAM, getBitmapUriFromBitmap(this@MainActivity, image))
-            putExtra("jid", phoneNumberWithCC + "@s.whatsapp.net"); //phone number without "+" prefix
-            putExtra(Intent.EXTRA_TEXT, text)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            type = "image/*"
-        }
-        startActivity(shareIntent)
+//        val callingNumber = phoneNumber.replace("+", "")
+//        var phoneNumberWithCC = callingNumber
+//        if (callingNumber.length == 10) {
+//            phoneNumberWithCC = "91$callingNumber"
+//        }
+//        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+//            setPackage("com.whatsapp");
+//            component = ComponentName("com.whatsapp", "com.whatsapp.contact.picker.ContactPicker")
+//            putExtra(Intent.EXTRA_STREAM, getBitmapUriFromBitmap(this@MainActivity, image))
+//            putExtra("jid", phoneNumberWithCC + "@s.whatsapp.net"); //phone number without "+" prefix
+//            putExtra(Intent.EXTRA_TEXT, text)
+//            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//            type = "image/*"
+//        }
+//        startActivity(shareIntent)
+//        finishAffinity()
+
+        val toNumber = phoneNumber.replace("+", "").replace(" ", "")
+        val sentIntent=Intent("android.intent.action.MAIN")
+        sentIntent.putExtra("jid","$toNumber@s.whatsapp.net")
+        sentIntent.putExtra(Intent.EXTRA_STREAM, getBitmapUriFromBitmap(this@MainActivity, image))
+        sentIntent.putExtra(Intent.EXTRA_TEXT,text)
+        sentIntent.setAction(Intent.ACTION_SEND)
+        sentIntent.setPackage("com.whatsapp")
+        sentIntent.setType("text/plain")
+        sentIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        sentIntent.setType("image/*")
+        startActivity(sentIntent)
         finishAffinity()
     }
 
@@ -219,7 +232,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Add FLAG_ACTIVITY_NEW_TASK flag
                 whatsappIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//                this.startActivity(whatsappIntent)
+                this.startActivity(whatsappIntent)
                 if (ElectionDataHolder.messageBitmap == null) {
                     Snackbar.make(root, "Message not downloaded", Snackbar.LENGTH_SHORT).show()
                 } else if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
