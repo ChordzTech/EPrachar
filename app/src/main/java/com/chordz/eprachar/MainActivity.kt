@@ -232,7 +232,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Add FLAG_ACTIVITY_NEW_TASK flag
                 whatsappIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                this.startActivity(whatsappIntent)
+//                this.startActivity(whatsappIntent)
                 if (ElectionDataHolder.messageBitmap == null) {
                     Snackbar.make(root, "Message not downloaded", Snackbar.LENGTH_SHORT).show()
                 } else if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
