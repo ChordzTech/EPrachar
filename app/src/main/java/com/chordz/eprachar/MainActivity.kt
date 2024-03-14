@@ -136,9 +136,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun shareViaWhatsApp(image: Bitmap, text: String, phoneNumber: String) {
         val callingNumber = phoneNumber.replace("+", "");
-        var phoneNumberWithCC = phoneNumber
-        if (phoneNumber.length == 10) {
-            phoneNumberWithCC = "91$phoneNumber"
+        var phoneNumberWithCC = callingNumber
+        if (callingNumber.length == 10) {
+            phoneNumberWithCC = "91$callingNumber"
         }
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             setPackage("com.whatsapp");
@@ -504,7 +504,6 @@ class MainActivity : AppCompatActivity() {
             if (isConnectedToInternet()) {
                 homeViewModel!!.getMsgContactNo(this, editTextValue)
             } else {
-
                 showNoInternetDialog()
             }
 
