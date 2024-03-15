@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import com.chordz.eprachar.data.response.ElectionMessageResponse
 
 object ElectionDataHolder {
+    lateinit var ImageUrl: String
     var DailyCountUpdateTime: Long? = null
     var hourlyMessageUpdateTime: Long? =null
     var messageBitmap: Bitmap? = null

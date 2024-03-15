@@ -32,6 +32,7 @@ class HomeViewModel(val repository: MainRepository) : ViewModel() {
             when (val response = repository.getElectionDetailsMsgByContact(a_contactno)) {
                 is NetworkState.Success -> {
                     if (response.data.code == 200) {
+                        ElectionDataHolder.ImageUrl = ElectionDataHolder.BASE_URL + response.data?.data!![0]!!.aImage!!
                         Glide.with(context).asBitmap()
                             .load(
                                 ElectionDataHolder.BASE_URL + response.data?.data!![0]!!.aImage!!

@@ -153,10 +153,10 @@ class MainActivity : AppCompatActivity() {
 //        finishAffinity()
 
         val toNumber = phoneNumber.replace("+", "").replace(" ", "")
-        val sentIntent=Intent("android.intent.action.MAIN")
-        sentIntent.putExtra("jid","$toNumber@s.whatsapp.net")
+        val sentIntent = Intent("android.intent.action.MAIN")
+        sentIntent.putExtra("jid", "$toNumber@s.whatsapp.net")
         sentIntent.putExtra(Intent.EXTRA_STREAM, getBitmapUriFromBitmap(this@MainActivity, image))
-        sentIntent.putExtra(Intent.EXTRA_TEXT,text)
+//        sentIntent.putExtra(Intent.EXTRA_TEXT, text)
         sentIntent.setAction(Intent.ACTION_SEND)
         sentIntent.setPackage("com.whatsapp")
         sentIntent.setType("text/plain")
@@ -232,15 +232,17 @@ class MainActivity : AppCompatActivity() {
 
                 // Add FLAG_ACTIVITY_NEW_TASK flag
                 whatsappIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//                this.startActivity(whatsappIntent)
+                this.startActivity(whatsappIntent)
                 if (ElectionDataHolder.messageBitmap == null) {
                     Snackbar.make(root, "Message not downloaded", Snackbar.LENGTH_SHORT).show()
                 } else if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
-                    shareViaWhatsApp(
-                        ElectionDataHolder.messageBitmap!!,
-                        defaultMessage!!,
-                        phoneNumber
-                    )
+                    Handler(Looper.myLooper()!!).postDelayed({
+                        shareViaWhatsApp(
+                            ElectionDataHolder.messageBitmap!!,
+                            defaultMessage!!,
+                            phoneNumber
+                        )
+                    }, 5000)
                 }
             } else {
                 Toast.makeText(this, "Reset Prachar", Toast.LENGTH_SHORT).show()
