@@ -46,6 +46,7 @@ public class WhatsappAccessibilityService extends AccessibilityService {
         if (AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)
         ) {
             sendMessageButton.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+
         }
         // Now go back to your app by clicking on the Android back button twice: 
         // First one to leave the conversation screen 
