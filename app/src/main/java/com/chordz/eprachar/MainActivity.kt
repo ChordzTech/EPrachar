@@ -153,8 +153,14 @@ class MainActivity : AppCompatActivity() {
 //        finishAffinity()
 
         val toNumber = phoneNumber.replace("+", "").replace(" ", "")
+        // Check if the phoneNumber starts with "+91", if not, prepend "+91"
+        val formattedNumber = if (!phoneNumber.startsWith("+91")) {
+            "91$toNumber"
+        } else {
+            toNumber
+        }
         val sentIntent = Intent("android.intent.action.MAIN")
-        sentIntent.putExtra("jid", "$toNumber@s.whatsapp.net")
+        sentIntent.putExtra("jid", "$formattedNumber@s.whatsapp.net")
         sentIntent.putExtra(Intent.EXTRA_STREAM, getBitmapUriFromBitmap(this@MainActivity, image))
 //        sentIntent.putExtra(Intent.EXTRA_TEXT, text)
         sentIntent.setAction(Intent.ACTION_SEND)
