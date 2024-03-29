@@ -4,12 +4,12 @@ import android.Manifest
 import android.accessibilityservice.AccessibilityService
 import android.app.ActivityManager
 import android.app.AlertDialog
-import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
@@ -18,7 +18,6 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
-import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
 import android.text.TextUtils
 import android.util.Log
@@ -194,7 +193,7 @@ class MainActivity : AppCompatActivity() {
         context.startActivity(Intent.createChooser(shareIntent, "Share via"))
     }
 
-    private fun getBitmapUriFromBitmap(context: Context, bitmap: Bitmap): Uri? {
+        private fun getBitmapUriFromBitmap(context: Context, bitmap: Bitmap): Uri? {
         var bmpUri: Uri? = null
         try {
             val file = File(
@@ -210,6 +209,9 @@ class MainActivity : AppCompatActivity() {
         }
         return bmpUri
     }
+
+
+
 
     private fun openWhatsApp(context: Context, phoneNumber: String) {
         serviceManager = AccessibilityServiceManager(context)
