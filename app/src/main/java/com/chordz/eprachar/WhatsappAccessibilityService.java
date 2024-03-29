@@ -54,8 +54,11 @@ public class WhatsappAccessibilityService extends AccessibilityService {
                 // Now fire a click on the send button
                 return;
             }
-            performGlobalAction(GLOBAL_ACTION_BACK);
-            performGlobalAction(GLOBAL_ACTION_BACK);
+            if (AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)
+            ) {
+                performGlobalAction(GLOBAL_ACTION_BACK);
+                performGlobalAction(GLOBAL_ACTION_BACK);
+            }
             Thread.sleep(500);  // same hack as above
         } catch (InterruptedException ignored) {
         }
@@ -64,8 +67,11 @@ public class WhatsappAccessibilityService extends AccessibilityService {
             // Now fire a click on the send button
             return;
         }
-        performGlobalAction(GLOBAL_ACTION_BACK);
-        performGlobalAction(GLOBAL_ACTION_BACK);
+        if (AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)
+        ) {
+            performGlobalAction(GLOBAL_ACTION_BACK);
+            performGlobalAction(GLOBAL_ACTION_BACK);
+        }
     }
 
     @Override

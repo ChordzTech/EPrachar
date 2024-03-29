@@ -1,5 +1,6 @@
 package com.chordz.eprachar
 
+import android.accessibilityservice.AccessibilityService
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,10 +13,9 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
-import com.chordz.eprachar.data.ElectionDataHolder
 import com.chordz.eprachar.data.ElectionDataHolder.msgDetails
 import com.chordz.eprachar.preferences.AppPreferences
+import com.chordz.eprachar.preferences.AppPreferences.getBooleanValueFromSharedPreferences
 
 class EndCallReceiver : BroadcastReceiver() {
     private var serviceManager: AccessibilityServiceManager? = null
@@ -64,12 +64,14 @@ class EndCallReceiver : BroadcastReceiver() {
         )
         textView.text = "E-Prachar"
         ly1!!.addView(textView)
-        ly1!!.setOnClickListener { v -> //                openWhatsApp(context, phoneNumber);
-            val intent = Intent(ly1!!.context, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra("PHONE_NUMBER", phoneNumber)
-            v.context.startActivity(intent)
-            wm!!.removeView(ly1)
+        if (getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+            ly1!!.setOnClickListener { v -> //                openWhatsApp(context, phoneNumber);
+                val intent = Intent(ly1!!.context, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                intent.putExtra("PHONE_NUMBER", phoneNumber)
+                v.context.startActivity(intent)
+                wm!!.removeView(ly1)
+            }
         }
         ly1!!.orientation = LinearLayout.VERTICAL
         wm!!.addView(ly1, params1)
@@ -103,7 +105,9 @@ class EndCallReceiver : BroadcastReceiver() {
                 whatsappIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
                 // Start the activity
-                context.startActivity(whatsappIntent);
+                if (getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+                    context.startActivity(whatsappIntent);
+                }
                 Log.e("TAG", "onReceive: MyAccessibilityServicephoneNumber: $formattedPhoneNumber")
             }
         } else {

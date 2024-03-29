@@ -49,7 +49,7 @@ public class MyAccessibilityService extends AccessibilityService {
                         return;
                     }
                     if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
-                       return;
+                        return;
                     }
                     sendMessage.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     try {
@@ -59,8 +59,11 @@ public class MyAccessibilityService extends AccessibilityService {
                             // Now fire a click on the send button
                             return;
                         }
-                        performGlobalAction(GLOBAL_ACTION_BACK);
-                        performGlobalAction(GLOBAL_ACTION_BACK);
+                        if (AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)
+                        ) {
+                            performGlobalAction(GLOBAL_ACTION_BACK);
+                            performGlobalAction(GLOBAL_ACTION_BACK);
+                        }
                         //add below line, if u want to close whatsApp;
                         //performGlobalAction(GLOBAL_ACTION_BACK);
                         Thread.sleep(2000);
