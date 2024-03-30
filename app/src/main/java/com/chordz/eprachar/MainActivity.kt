@@ -252,6 +252,11 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun openWhatsApp(context: Context, phoneNumber: String) {
+        // Check if WhatsApp switch is on
+        if (!AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+            // If WhatsApp switch is off, return without opening WhatsApp
+            return
+        }
         serviceManager = AccessibilityServiceManager(context)
         if (serviceManager.hasAccessibilityServicePermission(MyAccessibilityService::class.java)) {
             val response = msgDetails
