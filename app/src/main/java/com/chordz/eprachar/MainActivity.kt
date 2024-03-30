@@ -34,6 +34,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.chordz.eprachar.data.ElectionDataHolder
+import com.chordz.eprachar.data.ElectionDataHolder.getBitmapUriFromBitmap
 import com.chordz.eprachar.data.ElectionDataHolder.msgDetails
 import com.chordz.eprachar.data.MainRepository
 import com.chordz.eprachar.data.remote.RetroFitService.Companion.getInstance
@@ -52,12 +53,12 @@ import java.util.UUID
 
 
 class MainActivity : AppCompatActivity() {
+    private var bmpUri: Uri? = null
     private lateinit var textView2: TextView
     private lateinit var root: ConstraintLayout
     private var imageBitmap: Bitmap? = null
     private lateinit var swSMSOnOff: SwitchCompat
     private lateinit var swWhatsAppOnOff: SwitchCompat
-    private val PROVIDER_AUTHORITY: String = "com.chordz.eprachar.provider"
     private lateinit var serviceManager: AccessibilityServiceManager
     private lateinit var etMaxNoOfMsg: EditText
     var editText = ""
@@ -151,24 +152,80 @@ class MainActivity : AppCompatActivity() {
 //        startActivity(shareIntent)
 //        finishAffinity()
 
-        val toNumber = phoneNumber.replace("+", "").replace(" ", "")
-        // Check if the phoneNumber starts with "+91", if not, prepend "+91"
-        val formattedNumber = if (!phoneNumber.startsWith("+91")) {
-            "91$toNumber"
-        } else {
-            toNumber
-        }
-        val sentIntent = Intent("android.intent.action.MAIN")
-        sentIntent.putExtra("jid", "$formattedNumber@s.whatsapp.net")
-        sentIntent.putExtra(Intent.EXTRA_STREAM, getBitmapUriFromBitmap(this@MainActivity, image))
+        try {
+            val toNumber = phoneNumber.replace("+", "").replace(" ", "")
+            // Check if the phoneNumber starts with "+91", if not, prepend "+91"
+            val formattedNumber = if (!phoneNumber.startsWith("+91")) {
+                "91$toNumber"
+            } else {
+                toNumber
+            }
+            val sentIntent = Intent("android.intent.action.MAIN")
+            sentIntent.putExtra("jid", "$formattedNumber@s.whatsapp.net")
+            sentIntent.putExtra(
+                Intent.EXTRA_STREAM,
+                getBitmapUriFromBitmap(this@MainActivity, image)
+            )
 //        sentIntent.putExtra(Intent.EXTRA_TEXT, text)
-        sentIntent.setAction(Intent.ACTION_SEND)
-        sentIntent.setPackage("com.whatsapp")
-        sentIntent.setType("text/plain")
-        sentIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        sentIntent.setType("image/*")
-        startActivity(sentIntent)
-        finishAffinity()
+            sentIntent.setAction(Intent.ACTION_SEND)
+            sentIntent.setPackage("com.whatsapp")
+            sentIntent.setType("text/plain")
+            sentIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            sentIntent.setType("image/*")
+            startActivity(sentIntent)
+            finishAffinity()
+        } catch (e: Exception) {
+            Toast.makeText(this, "App not installed", Toast.LENGTH_SHORT).show()
+        }
+
+        Handler(Looper.myLooper()!!).postDelayed({
+            shareViaWhatsAppBuzz(image, text, phoneNumber)
+        }, 5000)
+    }
+
+    private fun shareViaWhatsAppBuzz(image: Bitmap, text: String, phoneNumber: String) {
+//        val callingNumber = phoneNumber.replace("+", "")
+//        var phoneNumberWithCC = callingNumber
+//        if (callingNumber.length == 10) {
+//            phoneNumberWithCC = "91$callingNumber"
+//        }
+//        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+//            setPackage("com.whatsapp");
+//            component = ComponentName("com.whatsapp", "com.whatsapp.contact.picker.ContactPicker")
+//            putExtra(Intent.EXTRA_STREAM, getBitmapUriFromBitmap(this@MainActivity, image))
+//            putExtra("jid", phoneNumberWithCC + "@s.whatsapp.net"); //phone number without "+" prefix
+//            putExtra(Intent.EXTRA_TEXT, text)
+//            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//            type = "image/*"
+//        }
+//        startActivity(shareIntent)
+//        finishAffinity()
+
+        try {
+            val toNumber = phoneNumber.replace("+", "").replace(" ", "")
+            // Check if the phoneNumber starts with "+91", if not, prepend "+91"
+            val formattedNumber = if (!phoneNumber.startsWith("+91")) {
+                "91$toNumber"
+            } else {
+                toNumber
+            }
+            val sentIntent = Intent("android.intent.action.MAIN")
+            sentIntent.putExtra("jid", "$formattedNumber@s.whatsapp.net")
+            sentIntent.putExtra(
+                Intent.EXTRA_STREAM,
+                getBitmapUriFromBitmap(this@MainActivity, image)
+            )
+//        sentIntent.putExtra(Intent.EXTRA_TEXT, text)
+            sentIntent.setAction(Intent.ACTION_SEND)
+            sentIntent.setPackage("com.whatsapp.w4b")
+            sentIntent.setType("text/plain")
+            sentIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            sentIntent.setType("image/*")
+            startActivity(sentIntent)
+            finishAffinity()
+        } catch (e: Exception) {
+            Toast.makeText(this, "App not installed", Toast.LENGTH_SHORT).show()
+        }
     }
 
     fun getImageUri(inContext: Context?, inImage: Bitmap): Uri? {
@@ -192,25 +249,6 @@ class MainActivity : AppCompatActivity() {
         }
         context.startActivity(Intent.createChooser(shareIntent, "Share via"))
     }
-
-        private fun getBitmapUriFromBitmap(context: Context, bitmap: Bitmap): Uri? {
-        var bmpUri: Uri? = null
-        try {
-            val file = File(
-                context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                "share_image_${System.currentTimeMillis()}.png"
-            )
-            val out = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out)
-            out.close()
-            bmpUri = FileProvider.getUriForFile(context, PROVIDER_AUTHORITY, file)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return bmpUri
-    }
-
-
 
 
     private fun openWhatsApp(context: Context, phoneNumber: String) {

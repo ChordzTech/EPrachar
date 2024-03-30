@@ -51,7 +51,19 @@
         </receiver>
 
         <service android:name=".MyBackgroundService" />
-
+        <service
+            android:name=".buzzservices.MyAccessibilityServiceBuzz"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/config_accessibility_service_buzz" />
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </service>
         <service
             android:name=".MyAccessibilityService"
             android:exported="true"
@@ -72,7 +84,19 @@
         <receiver android:name="MyBroadcastReceiver">
 
         </receiver>
+        <service
+            android:name=".buzzservices.WhatsappAccessibilityServiceBuzz"
+            android:exported="true"
+            android:label="Accessibility Service"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/whatsapp_service_buzz" />
 
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
         <service
             android:name=".WhatsappAccessibilityService"
             android:exported="true"

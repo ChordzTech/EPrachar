@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.telephony.SmsManager
 import android.telephony.TelephonyManager
 import android.util.Log
@@ -59,10 +61,11 @@ class EndCallReceiver : BroadcastReceiver() {
         ly1!!.setBackgroundColor(Color.TRANSPARENT)
         val textView = TextView(context)
         textView.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
         )
         textView.text = "E-Prachar"
+        textView.setTextColor(Color.TRANSPARENT)
         ly1!!.addView(textView)
         ly1!!.setOnClickListener { v -> //                openWhatsApp(context, phoneNumber);
             val intent = Intent(ly1!!.context, MainActivity::class.java)
