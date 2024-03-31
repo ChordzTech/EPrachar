@@ -175,12 +175,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(sentIntent)
             finishAffinity()
         } catch (e: Exception) {
-            Toast.makeText(this, "App not installed", Toast.LENGTH_SHORT).show()
+            Handler(Looper.myLooper()!!).postDelayed({
+                shareViaWhatsAppBuzz(image, text, phoneNumber)
+            }, 2000)
         }
 
-        Handler(Looper.myLooper()!!).postDelayed({
-            shareViaWhatsAppBuzz(image, text, phoneNumber)
-        }, 5000)
+
     }
 
     private fun shareViaWhatsAppBuzz(image: Bitmap, text: String, phoneNumber: String) {
@@ -293,7 +293,7 @@ class MainActivity : AppCompatActivity() {
                             defaultMessage!!,
                             phoneNumber
                         )
-                    }, 5000)
+                    }, 3000)
                 }
             } else {
                 Toast.makeText(this, "Reset Prachar", Toast.LENGTH_SHORT).show()
