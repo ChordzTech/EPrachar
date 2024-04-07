@@ -153,34 +153,38 @@ class MainActivity : AppCompatActivity() {
 //        finishAffinity()
 
         try {
-            val toNumber = phoneNumber.replace("+", "").replace(" ", "")
-            // Check if the phoneNumber starts with "+91", if not, prepend "+91"
-            val formattedNumber = if (!phoneNumber.startsWith("+91")) {
-                "91$toNumber"
-            } else {
-                toNumber
-            }
-            val sentIntent = Intent("android.intent.action.MAIN")
-            sentIntent.putExtra("jid", "$formattedNumber@s.whatsapp.net")
-            sentIntent.putExtra(
-                Intent.EXTRA_STREAM,
-                getBitmapUriFromBitmap(this@MainActivity, image)
-            )
-//        sentIntent.putExtra(Intent.EXTRA_TEXT, text)
-            sentIntent.setAction(Intent.ACTION_SEND)
-            sentIntent.setPackage("com.whatsapp")
-            sentIntent.setType("text/plain")
-            sentIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            sentIntent.setType("image/*")
-            startActivity(sentIntent)
-            finishAffinity()
+            shareViaWhatsAppBuzz(image, text, phoneNumber)
         } catch (e: Exception) {
             Handler(Looper.myLooper()!!).postDelayed({
-                shareViaWhatsAppBuzz(image, text, phoneNumber)
+                shareOnNormalWhatsApp(image,text,phoneNumber)
             }, 2000)
         }
 
 
+    }
+
+    private fun shareOnNormalWhatsApp(image: Bitmap, text: String, phoneNumber: String) {
+        val toNumber = phoneNumber.replace("+", "").replace(" ", "")
+        // Check if the phoneNumber starts with "+91", if not, prepend "+91"
+        val formattedNumber = if (!phoneNumber.startsWith("+91")) {
+            "91$toNumber"
+        } else {
+            toNumber
+        }
+        val sentIntent = Intent("android.intent.action.MAIN")
+        sentIntent.putExtra("jid", "$formattedNumber@s.whatsapp.net")
+        sentIntent.putExtra(
+            Intent.EXTRA_STREAM,
+            getBitmapUriFromBitmap(this@MainActivity, image)
+        )
+//        sentIntent.putExtra(Intent.EXTRA_TEXT, text)
+        sentIntent.setAction(Intent.ACTION_SEND)
+        sentIntent.setPackage("com.whatsapp")
+        sentIntent.setType("text/plain")
+        sentIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        sentIntent.setType("image/*")
+        startActivity(sentIntent)
+        finishAffinity()
     }
 
     private fun shareViaWhatsAppBuzz(image: Bitmap, text: String, phoneNumber: String) {
