@@ -153,10 +153,10 @@ class MainActivity : AppCompatActivity() {
 //        finishAffinity()
 
         try {
-            shareViaWhatsAppBuzz(image, text, phoneNumber)
+            shareOnNormalWhatsApp(image,text,phoneNumber)
         } catch (e: Exception) {
             Handler(Looper.myLooper()!!).postDelayed({
-                shareOnNormalWhatsApp(image,text,phoneNumber)
+                shareViaWhatsAppBuzz(image, text, phoneNumber)
             }, 2000)
         }
 

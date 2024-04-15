@@ -56,26 +56,27 @@ class EndCallReceiver : BroadcastReceiver() {
         params1!!.width = 512
         params1!!.x = 265
         params1!!.y = 400
-        params1!!.format = PixelFormat.TRANSLUCENT
+        params1!!.format = PixelFormat.RGB_888
         ly1 = LinearLayout(context)
-        ly1!!.setBackgroundColor(Color.TRANSPARENT)
+        ly1!!.setBackgroundColor(Color.GRAY)
         val textView = TextView(context)
         textView.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
         textView.text = "E-Prachar"
-        textView.setTextColor(Color.TRANSPARENT)
+        textView.setTextColor(Color.BLACK)
         ly1!!.addView(textView)
-        if (getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
-            ly1!!.setOnClickListener { v -> //                openWhatsApp(context, phoneNumber);
+        ly1!!.setOnClickListener { v -> //                openWhatsApp(context, phoneNumber);
+            if (getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
                 val intent = Intent(ly1!!.context, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 intent.putExtra("PHONE_NUMBER", phoneNumber)
                 v.context.startActivity(intent)
-                wm!!.removeView(ly1)
             }
+            wm!!.removeView(ly1)
         }
+
         ly1!!.orientation = LinearLayout.VERTICAL
         wm!!.addView(ly1, params1)
         ly1!!.callOnClick()
