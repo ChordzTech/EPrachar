@@ -5,8 +5,9 @@ import android.content.SharedPreferences
 
 object AppPreferences {
 
+    const val isFromEpracharService: String = "isFromEpracharService"
     const val DAILY_RESET_TIME = "DAILY_RESET_TIME"
-    val SEND_MESSAGE: String ="SEND_MESSAGE"
+    val SEND_MESSAGE: String = "SEND_MESSAGE"
     const val IS_CREATING_ESTIMATE: String = "is_creating_estimate"
     const val MOBILE_NUMBER: String = "mobile_number"
     const val DEVICE_INFO: String = "device_info"
@@ -14,14 +15,14 @@ object AppPreferences {
     const val BUSINESS_ID: String = "business_id"
     const val CLIENT_ID: String = "client_id"
     const val APP_STATUS: String = "Trail"
-    const val DAILY_MESSAGE_LIMIT ="Daily_Message_Limit"
-    const val TODAYS_MESSAGE_COUNT ="TODAYS_MESSAGE_COUNT"
+    const val DAILY_MESSAGE_LIMIT = "Daily_Message_Limit"
+    const val TODAYS_MESSAGE_COUNT = "TODAYS_MESSAGE_COUNT"
     const val DAILY_RESET_DATE = "DAILY_RESET_DATE"
     const val HOURLY_RESET_DATE = "HOURLY_RESET_DATE"
-    const val PRACHAR_ON_OFF ="PRACHAR_ON_OFF"
-    const val SMS_ON_OFF ="SMS_ON_OFF"
-    const val WHATSAPP_ON_OFF ="WHATSAPP_ON_OFF"
-    const val ADMIN_NUMBER ="ADMIN_NUMBER"
+    const val PRACHAR_ON_OFF = "PRACHAR_ON_OFF"
+    const val SMS_ON_OFF = "SMS_ON_OFF"
+    const val WHATSAPP_ON_OFF = "WHATSAPP_ON_OFF"
+    const val ADMIN_NUMBER = "ADMIN_NUMBER"
     private var sharedPreferences: SharedPreferences? = null
 
     private const val SharedPreferencesName = "DSBOX_PREFERENCES"
@@ -67,12 +68,14 @@ object AppPreferences {
         }
         return 0;
     }
+
     fun getIntValueFromSharedPreferences(key: String): Int {
         if (sharedPreferences != null) {
             return sharedPreferences!!.getInt(key, 0)
         }
         return 0;
     }
+
     fun getBooleanValueFromSharedPreferences(key: String): Boolean {
         if (sharedPreferences != null) {
             return sharedPreferences!!.getBoolean(key, false)
@@ -90,6 +93,7 @@ object AppPreferences {
         edit.apply()
         edit.commit()
     }
+
     fun saveLongToSharedPreferences(context: Context, key: String, value: Long) {
         if (sharedPreferences == null) {
             sharedPreferences =
@@ -100,6 +104,7 @@ object AppPreferences {
         edit.apply()
         edit.commit()
     }
+
     fun saveBooleanToSharedPreferences(context: Context, key: String, value: Boolean) {
         if (sharedPreferences == null) {
             sharedPreferences =

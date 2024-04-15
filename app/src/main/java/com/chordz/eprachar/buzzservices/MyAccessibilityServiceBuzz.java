@@ -23,6 +23,9 @@ public class MyAccessibilityServiceBuzz extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         String packageName = event.getPackageName().toString();
         if (packageName.equals("com.whatsapp.w4b")) {
+            if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.isFromEpracharService)) {
+                return;
+            }
             PackageManager packageManager = this.getPackageManager();
             try {
                 ApplicationInfo info = packageManager.getApplicationInfo(packageName, 0);
@@ -50,7 +53,7 @@ public class MyAccessibilityServiceBuzz extends AccessibilityService {
                         return;
                     }
                     if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
-                       return;
+                        return;
                     }
                     sendMessage.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     try {
@@ -81,6 +84,7 @@ public class MyAccessibilityServiceBuzz extends AccessibilityService {
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
+
         }
     }
 

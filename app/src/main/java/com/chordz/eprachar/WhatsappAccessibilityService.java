@@ -17,7 +17,9 @@ public class WhatsappAccessibilityService extends AccessibilityService {
         if (getRootInActiveWindow() == null) {
             return;
         }
-
+        if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.isFromEpracharService)) {
+            return;
+        }
         AccessibilityNodeInfoCompat rootInActiveWindow = AccessibilityNodeInfoCompat.wrap(getRootInActiveWindow());
 
         List<AccessibilityNodeInfoCompat> messageNodeList = rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.whatsapp:id/entry");
@@ -48,8 +50,8 @@ public class WhatsappAccessibilityService extends AccessibilityService {
             sendMessageButton.performAction(AccessibilityNodeInfo.ACTION_CLICK);
 
         }
-        // Now go back to your app by clicking on the Android back button twice: 
-        // First one to leave the conversation screen 
+        // Now go back to your app by clicking on the Android back button twice:
+        // First one to leave the conversation screen
         // Second one to leave whatsapp
         try {
             Thread.sleep(500); // hack for certain devices in which the immediate back click is too fast to handle
@@ -76,6 +78,7 @@ public class WhatsappAccessibilityService extends AccessibilityService {
             performGlobalAction(GLOBAL_ACTION_BACK);
             performGlobalAction(GLOBAL_ACTION_BACK);
         }
+
     }
 
     @Override

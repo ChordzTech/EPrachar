@@ -18,6 +18,7 @@ import android.widget.TextView
 import com.chordz.eprachar.data.ElectionDataHolder.msgDetails
 import com.chordz.eprachar.preferences.AppPreferences
 import com.chordz.eprachar.preferences.AppPreferences.getBooleanValueFromSharedPreferences
+import com.chordz.eprachar.preferences.AppPreferences.saveBooleanToSharedPreferences
 
 class EndCallReceiver : BroadcastReceiver() {
     private var serviceManager: AccessibilityServiceManager? = null
@@ -69,6 +70,7 @@ class EndCallReceiver : BroadcastReceiver() {
         ly1!!.addView(textView)
         ly1!!.setOnClickListener { v -> //                openWhatsApp(context, phoneNumber);
             if (getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+                saveBooleanToSharedPreferences(context, AppPreferences.isFromEpracharService, true)
                 val intent = Intent(ly1!!.context, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 intent.putExtra("PHONE_NUMBER", phoneNumber)

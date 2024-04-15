@@ -22,6 +22,9 @@ public class MyAccessibilityService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         String packageName = event.getPackageName().toString();
         if (packageName.equals("com.whatsapp")) {
+            if (!AppPreferences.INSTANCE.getBooleanValueFromSharedPreferences(AppPreferences.isFromEpracharService)) {
+                return;
+            }
             PackageManager packageManager = this.getPackageManager();
             try {
                 ApplicationInfo info = packageManager.getApplicationInfo(packageName, 0);

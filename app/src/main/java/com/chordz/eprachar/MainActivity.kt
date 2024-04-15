@@ -153,14 +153,21 @@ class MainActivity : AppCompatActivity() {
 //        finishAffinity()
 
         try {
-            shareOnNormalWhatsApp(image,text,phoneNumber)
+            shareOnNormalWhatsApp(image, text, phoneNumber)
         } catch (e: Exception) {
             Handler(Looper.myLooper()!!).postDelayed({
                 shareViaWhatsAppBuzz(image, text, phoneNumber)
             }, 2000)
         }
-
-
+        Handler(Looper.myLooper()!!).postDelayed({
+            if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.isFromEpracharService)) {
+                AppPreferences.saveBooleanToSharedPreferences(
+                    this,
+                    AppPreferences.isFromEpracharService,
+                    false
+                )
+            }
+        }, 10000)
     }
 
     private fun shareOnNormalWhatsApp(image: Bitmap, text: String, phoneNumber: String) {
@@ -255,11 +262,21 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun openWhatsApp(context: Context, phoneNumber: String) {
+    private fun openWhatsApp(context: Context, mPhoneNumber: String) {
         // Check if WhatsApp switch is on
         if (!AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
             // If WhatsApp switch is off, return without opening WhatsApp
             return
+        }
+        if(mPhoneNumber.equals("null")||mPhoneNumber.isNullOrBlank()){
+            return
+        }
+        var phoneNumber = ""
+        if (mPhoneNumber.startsWith("0")) {
+            phoneNumber = mPhoneNumber?.subSequence(1, mPhoneNumber.length).toString()
+            phoneNumber = "+91$phoneNumber"
+        }else{
+            phoneNumber = mPhoneNumber
         }
         serviceManager = AccessibilityServiceManager(context)
         if (serviceManager.hasAccessibilityServicePermission(MyAccessibilityService::class.java)) {
@@ -269,7 +286,7 @@ class MainActivity : AppCompatActivity() {
                 val defaultMessage = details[0]!!.aMessage
                 val defaultImage = details[0]!!.aImage
                 if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF))
-                    sendSMSMessage(phoneNumber, defaultMessage!!)
+                    sendSMSMessage(formatPhoneNumber(phoneNumber)!!, defaultMessage!!)
 
 
                 //Code For New Line
@@ -321,8 +338,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun formatPhoneNumber(phoneNumber: String): String? {
-        // Implement your phone number formatting logic if needed
-        return phoneNumber
+        val toNumber = phoneNumber.replace("+", "").replace(" ", "")
+        // Check if the phoneNumber starts with "+91", if not, prepend "+91"
+        val formattedNumber = if (!phoneNumber.startsWith("+91") ) {
+            "91$toNumber"
+        } else {
+            toNumber
+        }
+        return formattedNumber
     }
 
 
