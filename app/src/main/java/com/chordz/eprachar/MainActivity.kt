@@ -338,14 +338,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun formatPhoneNumber(phoneNumber: String): String? {
-        val toNumber = phoneNumber.replace("+", "").replace(" ", "")
-        // Check if the phoneNumber starts with "+91", if not, prepend "+91"
-        val formattedNumber = if (!phoneNumber.startsWith("+91") ) {
-            "91$toNumber"
-        } else {
-            toNumber
-        }
-        return formattedNumber
+//        val toNumber = phoneNumber.replace("+", "").replace(" ", "")
+//        // Check if the phoneNumber starts with "+91", if not, prepend "+91"
+//        val formattedNumber = if (!phoneNumber.startsWith("+91") ) {
+//            "+91$toNumber"
+//        } else {
+//            toNumber
+//        }
+        return phoneNumber
     }
 
 
@@ -412,6 +412,7 @@ class MainActivity : AppCompatActivity() {
         if (ElectionDataHolder.hourlyMessageUpdateTime == null) {
             ElectionDataHolder.hourlyMessageUpdateTime = Calendar.getInstance().timeInMillis
         }
+        //off from e prachar service after 7 second
 
         if (ElectionDataHolder.DailyCountUpdateTime == null) {
             ElectionDataHolder.hourlyMessageUpdateTime = Calendar.getInstance().timeInMillis
