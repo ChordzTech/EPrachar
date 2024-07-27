@@ -69,7 +69,8 @@ class EndCallReceiver : BroadcastReceiver() {
         textView.setTextColor(Color.BLACK)
         ly1!!.addView(textView)
         ly1!!.setOnClickListener { v -> //                openWhatsApp(context, phoneNumber);
-            if (getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+            if (getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF) ||
+                getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF)) {
                 saveBooleanToSharedPreferences(context, AppPreferences.isFromEpracharService, true)
                 val intent = Intent(ly1!!.context, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

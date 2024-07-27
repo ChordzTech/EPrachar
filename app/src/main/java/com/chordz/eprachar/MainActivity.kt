@@ -9,11 +9,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
@@ -31,7 +29,6 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.chordz.eprachar.data.ElectionDataHolder
 import com.chordz.eprachar.data.ElectionDataHolder.getBitmapUriFromBitmap
@@ -45,9 +42,6 @@ import com.chordz.eprachar.viewModel.AppViewModelFactory
 import com.chordz.eprachar.viewModel.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import java.util.Calendar
 import java.util.UUID
 
@@ -187,11 +181,11 @@ class MainActivity : AppCompatActivity() {
             getBitmapUriFromBitmap(this@MainActivity, image)
         )
 //        sentIntent.putExtra(Intent.EXTRA_TEXT, text)
-        sentIntent.setAction(Intent.ACTION_SEND)
+        sentIntent.action = Intent.ACTION_SEND
         sentIntent.setPackage("com.whatsapp")
-        sentIntent.setType("text/plain")
+        sentIntent.type = "text/plain"
         sentIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        sentIntent.setType("image/*")
+        sentIntent.type = "image/*"
         startActivity(sentIntent)
         finishAffinity()
     }
@@ -231,11 +225,11 @@ class MainActivity : AppCompatActivity() {
                 getBitmapUriFromBitmap(this@MainActivity, image)
             )
 //        sentIntent.putExtra(Intent.EXTRA_TEXT, text)
-            sentIntent.setAction(Intent.ACTION_SEND)
+            sentIntent.action = Intent.ACTION_SEND
             sentIntent.setPackage("com.whatsapp.w4b")
-            sentIntent.setType("text/plain")
+            sentIntent.type = "text/plain"
             sentIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            sentIntent.setType("image/*")
+            sentIntent.type = "image/*"
             startActivity(sentIntent)
             finishAffinity()
         } catch (e: Exception) {
@@ -267,14 +261,14 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun openWhatsApp(context: Context, mPhoneNumber: String) {
-        if(mPhoneNumber.equals("null")||mPhoneNumber.isNullOrBlank()){
+        if (mPhoneNumber.equals("null") || mPhoneNumber.isNullOrBlank()) {
             return
         }
         var phoneNumber = ""
         if (mPhoneNumber.startsWith("0")) {
-            phoneNumber = mPhoneNumber?.subSequence(1, mPhoneNumber.length).toString()
+            phoneNumber = mPhoneNumber.subSequence(1, mPhoneNumber.length).toString()
             phoneNumber = "+91$phoneNumber"
-        }else{
+        } else {
             phoneNumber = mPhoneNumber
         }
         serviceManager = AccessibilityServiceManager(context)
@@ -287,6 +281,12 @@ class MainActivity : AppCompatActivity() {
                 if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF)) {
                     Toast.makeText(this, "Sending SMS", Toast.LENGTH_SHORT).show()
                     sendSMSMessage(formatPhoneNumber(phoneNumber)!!, defaultMessage!!)
+                }else{
+                    Toast.makeText(this, "Sending SMS is off", Toast.LENGTH_SHORT).show()
+                }
+                if (!AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
+                    Toast.makeText(this, "WhatsApp Posting is off", Toast.LENGTH_SHORT).show()
+                    return
                 }
 
 
@@ -339,7 +339,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun formatPhoneNumber(phoneNumber: String): String? {
+    private fun formatPhoneNumber(phoneNumber: String): String {
 //        val toNumber = phoneNumber.replace("+", "").replace(" ", "")
 //        // Check if the phoneNumber starts with "+91", if not, prepend "+91"
 //        val formattedNumber = if (!phoneNumber.startsWith("+91") ) {
@@ -428,7 +428,7 @@ class MainActivity : AppCompatActivity() {
 
         initObservable()
         root = findViewById(R.id.root)
-        etMaxNoOfMsg = findViewById(R.id.etMaxNoOfMsg);
+        etMaxNoOfMsg = findViewById(R.id.etMaxNoOfMsg)
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText)
         openWhatsAppButton = findViewById(R.id.openWhatsAppButton)
         swOnOff = findViewById(R.id.swOnOff)
@@ -621,7 +621,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkPermissions(): Boolean {
         AppPreferences.saveStringToSharedPreferences(
             this, AppPreferences.DAILY_RESET_DATE,
-            com.chordz.eprachar.DateUtils.getCurrentDateTime()
+            DateUtils.getCurrentDateTime()
         )
         val readCallLogPermission =
             ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
@@ -703,7 +703,7 @@ class MainActivity : AppCompatActivity() {
 
         if (phoneNumber != null) {
             Log.e("TAG", "processPrachar onNewIntent: ")
-            processPrachar(phoneNumber);
+            processPrachar(phoneNumber)
         }
     }
 
