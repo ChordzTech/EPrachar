@@ -171,6 +171,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun shareOnNormalWhatsApp(image: Bitmap, text: String, phoneNumber: String) {
+        Toast.makeText(this, "Sending WhatsApp Post", Toast.LENGTH_SHORT).show()
+
         val toNumber = phoneNumber.replace("+", "").replace(" ", "")
         // Check if the phoneNumber starts with "+91", if not, prepend "+91"
         val formattedNumber = if (!phoneNumber.startsWith("+91")) {
@@ -213,6 +215,8 @@ class MainActivity : AppCompatActivity() {
 //        finishAffinity()
 
         try {
+            Toast.makeText(this, "Sending WhatsApp Buzz Post", Toast.LENGTH_SHORT).show()
+
             val toNumber = phoneNumber.replace("+", "").replace(" ", "")
             // Check if the phoneNumber starts with "+91", if not, prepend "+91"
             val formattedNumber = if (!phoneNumber.startsWith("+91")) {
@@ -263,11 +267,6 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun openWhatsApp(context: Context, mPhoneNumber: String) {
-        // Check if WhatsApp switch is on
-        if (!AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.WHATSAPP_ON_OFF)) {
-            // If WhatsApp switch is off, return without opening WhatsApp
-            return
-        }
         if(mPhoneNumber.equals("null")||mPhoneNumber.isNullOrBlank()){
             return
         }
@@ -285,8 +284,10 @@ class MainActivity : AppCompatActivity() {
                 val details = response.data
                 val defaultMessage = details[0]!!.aMessage
                 val defaultImage = details[0]!!.aImage
-                if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF))
+                if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF)) {
+                    Toast.makeText(this, "Sending SMS", Toast.LENGTH_SHORT).show()
                     sendSMSMessage(formatPhoneNumber(phoneNumber)!!, defaultMessage!!)
+                }
 
 
                 //Code For New Line
@@ -301,6 +302,7 @@ class MainActivity : AppCompatActivity() {
                 whatsappIntent.data = Uri.parse(
                     "https://wa.me/" + formattedPhoneNumber + "?text=" + Uri.encode(defaultMessage)
                 )
+                Toast.makeText(this, "Sending WhatsApp Message", Toast.LENGTH_SHORT).show()
 
                 // Add FLAG_ACTIVITY_NEW_TASK flag
                 whatsappIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
