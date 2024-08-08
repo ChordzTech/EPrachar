@@ -149,9 +149,9 @@ class MainActivity : AppCompatActivity() {
         try {
             shareOnNormalWhatsApp(image, text, phoneNumber)
         } catch (e: Exception) {
-            Handler(Looper.myLooper()!!).postDelayed({
-                shareViaWhatsAppBuzz(image, text, phoneNumber)
-            }, 2000)
+//            Handler(Looper.myLooper()!!).postDelayed({
+//                shareViaWhatsAppBuzz(image, text, phoneNumber)
+//            }, 2000)
         }
         Handler(Looper.myLooper()!!).postDelayed({
             if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.isFromEpracharService)) {
