@@ -26,7 +26,7 @@ public class WhatsappAccessibilityService extends AccessibilityService {
         if (messageNodeList != null && !messageNodeList.isEmpty()) {
             AccessibilityNodeInfoCompat messageField = messageNodeList.get(0);
             if (messageField.getText() == null || messageField.getText().length() == 0
-                    || !messageField.getText().toString().endsWith(getApplicationContext().getString(R.string.whatsapp_suffix))) { // So your service doesn't process any message, but the ones ending your apps suffix
+                    || !messageField.getText().toString().contains(getApplicationContext().getString(R.string.whatsapp_suffix))) { // So your service doesn't process any message, but the ones ending your apps suffix
                 return;
             }
         }

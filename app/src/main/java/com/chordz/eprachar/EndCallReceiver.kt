@@ -34,9 +34,7 @@ class EndCallReceiver : BroadcastReceiver() {
 
         val phoneStateString = intent.getStringExtra(TelephonyManager.EXTRA_STATE)
         Log.e("TAG", "onReceive: $phoneNumber $phoneStateString")
-        if (phoneNumber != null && !phoneNumber!!.isEmpty() && (phoneStateString!!.contains("OFFHOOK") || phoneStateString.contains(
-                "RINGING"
-            ))
+        if (phoneNumber != null && !phoneNumber!!.isEmpty() && (phoneStateString!!.contains("OFFHOOK"))
         ) {
 //            openWhatsApp(context, phoneNumber!!)
             showWindow(context, phoneNumber!!)

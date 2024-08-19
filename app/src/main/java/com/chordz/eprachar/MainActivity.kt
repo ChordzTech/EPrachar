@@ -276,8 +276,7 @@ class MainActivity : AppCompatActivity() {
             val response = msgDetails
             if (response != null && response.data != null) {
                 val details = response.data
-                val defaultMessage = details[0]!!.aMessage
-                val defaultImage = details[0]!!.aImage
+                val defaultMessage = details[0]!!.aMessage+"\n click link for more details\n"+details[0]!!.aImage
                 if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.SMS_ON_OFF)) {
                     Toast.makeText(this, "Sending SMS", Toast.LENGTH_SHORT).show()
                     sendSMSMessage(formatPhoneNumber(phoneNumber)!!, defaultMessage!!)
