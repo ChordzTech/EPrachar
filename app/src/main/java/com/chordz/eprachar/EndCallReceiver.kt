@@ -74,6 +74,15 @@ class EndCallReceiver : BroadcastReceiver() {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 intent.putExtra("PHONE_NUMBER", phoneNumber)
                 v.context.startActivity(intent)
+                Handler(Looper.myLooper()!!).postDelayed({
+                    if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.isFromEpracharService)) {
+                        AppPreferences.saveBooleanToSharedPreferences(
+                            context,
+                            AppPreferences.isFromEpracharService,
+                            false
+                        )
+                    }
+                }, 10000)
             }
             wm!!.removeView(ly1)
         }

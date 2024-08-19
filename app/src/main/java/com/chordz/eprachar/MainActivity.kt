@@ -154,15 +154,6 @@ class MainActivity : AppCompatActivity() {
                 shareViaWhatsAppBuzz(image, text, phoneNumber)
             }, 2000)
         }
-        Handler(Looper.myLooper()!!).postDelayed({
-            if (AppPreferences.getBooleanValueFromSharedPreferences(AppPreferences.isFromEpracharService)) {
-                AppPreferences.saveBooleanToSharedPreferences(
-                    this,
-                    AppPreferences.isFromEpracharService,
-                    false
-                )
-            }
-        }, 10000)
     }
 
     private fun shareOnNormalWhatsApp(image: Bitmap, text: String, phoneNumber: String) {
