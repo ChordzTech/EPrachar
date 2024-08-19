@@ -1,6 +1,7 @@
 package com.chordz.eprachar
 
 import android.Manifest
+import android.R.attr
 import android.accessibilityservice.AccessibilityService
 import android.app.ActivityManager
 import android.app.AlertDialog
@@ -331,8 +332,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun sendSMSMessage(phoneNumber: String, defaultMessage: String) {
         try {
-            val smsManager = SmsManager.getDefault()
-            smsManager.sendTextMessage(phoneNumber, phoneNumber, defaultMessage, null, null)
+            val sms = SmsManager.getDefault()
+            val parts: ArrayList<String> = sms.divideMessage(defaultMessage)
+            sms.sendMultipartTextMessage(phoneNumber, null, parts, null, null)
+//            smsManager.sendTextMessage(phoneNumber, phoneNumber, defaultMessage, null, null)
         } catch (e: Exception) {
             e.printStackTrace()
         }
