@@ -333,14 +333,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun formatPhoneNumber(phoneNumber: String): String {
-//        val toNumber = phoneNumber.replace("+", "").replace(" ", "")
-//        // Check if the phoneNumber starts with "+91", if not, prepend "+91"
-//        val formattedNumber = if (!phoneNumber.startsWith("+91") ) {
-//            "+91$toNumber"
-//        } else {
-//            toNumber
-//        }
-        return phoneNumber
+        val toNumber = phoneNumber.replace("+", "").replace(" ", "")
+        // Check if the phoneNumber starts with "+91", if not, prepend "+91"
+        val formattedNumber = if (!phoneNumber.startsWith("+91") ) {
+            "+91$toNumber"
+        } else {
+            toNumber
+        }
+        return formattedNumber
     }
 
 
